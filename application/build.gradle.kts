@@ -1,16 +1,10 @@
-plugins {
-    kotlin("jvm")
-}
+dependencies {}
 
-group = "com.lomeone"
-version = "0.0.1"
+application {
+    mainClass.set("com.lomeone.application.ApplicationKt")
 
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    testImplementation("org.jetbrains.kotlin:kotlin-test")
+    val isDevelopment: Boolean = project.ext.has("development")
+    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
 }
 
 tasks.test {
