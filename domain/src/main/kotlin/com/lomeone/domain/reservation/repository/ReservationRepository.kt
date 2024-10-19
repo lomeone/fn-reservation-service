@@ -4,5 +4,6 @@ import com.lomeone.com.lomeone.domain.reservation.entity.Reservation
 import org.bson.BsonValue
 
 interface ReservationRepository {
-    suspend fun insertOne(reservation: Reservation): BsonValue?
+    suspend fun findByLatestGameType(gameType: String): Reservation?
+    suspend fun insertOne(reservation: Reservation): Reservation
 }
