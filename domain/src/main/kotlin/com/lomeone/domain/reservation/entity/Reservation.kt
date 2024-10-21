@@ -8,27 +8,29 @@ data class Reservation(
     @BsonId
     val id: ObjectId = ObjectId(),
     val gameType: String,
-    val session: String,
+    val session: Int,
     @BsonProperty("reservation")
-    private val _reservation: MutableMap<String, String> = mutableMapOf(),
-    private var status: ReservationStatus = ReservationStatus.OPEN
+    val _reservation: MutableMap<String, String> = mutableMapOf(),
+    var status: ReservationStatus = ReservationStatus.OPEN
 ) {
     val reservation: Map<String, String>
-        get() = _reservation.toMap()
-
-    fun getStatus() = status
+        get() = this._reservation.toMap()
 
     fun reserve(name: String, time: String) {
-        _reservation.put(name, time)
+        this._reservation.put(name, time)
     }
 
     fun cancel(name: String) {
-        _reservation.remove(name)
+        this._reservation.remove(name)
     }
 
     fun closeReservation() {
-        status = ReservationStatus.CLOSED
+        this.status = ReservationStatus.CLOSED
     }
+
+    fun isOpen() = this.status == ReservationStatus.OPEN
+
+    fun isClosed() = this.status == ReservationStatus.CLOSED
 }
 
 enum class ReservationStatus {
