@@ -26,7 +26,6 @@ fun Application.routeReservation() {
     install(Koin) {
         modules(module {
             single {
-                MongoClient.create(infrastructureConfig.property("ktor.mongo.uri").getString())
             }
             single {
                 get<MongoClient>().getDatabase(infrastructureConfig.property("ktor.mongo.database").getString())
@@ -55,8 +54,8 @@ fun Application.routeReservation() {
         }
         post<ReservationStart> {
             val request = call.receive<ReservationRequest>()
-            println("test $request")
             val command = StartReservationCommand(
+                storeBranch = request.storeBranch,
                 gameType = request.gameType,
                 24102001
             )
@@ -76,5 +75,6 @@ class ReservationStart
 
 @Serializable
 data class ReservationRequest(
+    val storeBranch: String,
     val gameType: String
 )
