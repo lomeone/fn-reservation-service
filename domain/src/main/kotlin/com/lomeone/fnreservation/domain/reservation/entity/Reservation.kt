@@ -1,4 +1,4 @@
-package com.lomeone.com.lomeone.domain.reservation.entity
+package com.lomeone.fnreservation.domain.reservation.entity
 
 import org.bson.codecs.pojo.annotations.BsonId
 import org.bson.codecs.pojo.annotations.BsonProperty

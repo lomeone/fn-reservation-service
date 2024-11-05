@@ -1,7 +1,9 @@
-package com.lomeone.application
+package com.lomeone.fnreservation.application
 
-import com.lomeone.application.plugins.*
-import com.lomeone.application.rest.api.reservation.routeReservation
+import com.lomeone.fnreservation.application.rest.api.reservation.routeReservation
+import com.lomeone.fnreservation.application.plugins.configureMonitoring
+import com.lomeone.fnreservation.application.plugins.configureRouting
+import com.lomeone.fnreservation.application.plugins.configureSerialization
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*

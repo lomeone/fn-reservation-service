@@ -1,11 +1,11 @@
-package com.lomeone.application.rest.api.reservation
+package com.lomeone.fnreservation.application.rest.api.reservation
 
-import com.lomeone.com.lomeone.domain.reservation.repository.ReservationRepository
-import com.lomeone.com.lomeone.domain.reservation.service.GetReservationQuery
-import com.lomeone.com.lomeone.domain.reservation.service.GetReservationService
-import com.lomeone.com.lomeone.domain.reservation.service.StartReservationCommand
-import com.lomeone.com.lomeone.domain.reservation.service.StartReservationService
-import com.lomeone.com.lomeone.infrastructure.reservation.repository.ReservationRepositoryImpl
+import com.lomeone.fnreservation.domain.reservation.repository.ReservationRepository
+import com.lomeone.fnreservation.domain.reservation.service.GetReservationQuery
+import com.lomeone.fnreservation.domain.reservation.service.GetReservationService
+import com.lomeone.fnreservation.domain.reservation.service.StartReservationCommand
+import com.lomeone.fnreservation.domain.reservation.service.StartReservationService
+import com.lomeone.com.lomeone.fnreservation.infrastructure.reservation.repository.ReservationRepositoryImpl
 import com.mongodb.kotlin.client.coroutine.MongoClient
 import com.typesafe.config.ConfigFactory
 import io.ktor.resources.*
@@ -25,7 +25,8 @@ fun Application.routeReservation() {
     val infrastructureConfig = HoconApplicationConfig(ConfigFactory.load("infrastructure.conf"))
     install(Koin) {
         modules(module {
-            single {
+            single<MongoClient> {
+                MongoClient.create(infrastructureConfig.property("ktor.mongo.uri").getString())
             }
             single {
                 get<MongoClient>().getDatabase(infrastructureConfig.property("ktor.mongo.database").getString())
@@ -42,13 +43,13 @@ fun Application.routeReservation() {
         })
     }
 
-    val getReservationService by inject<GetReservationService>()
     val startReservationService by inject<StartReservationService>()
+    val getReservationService by inject<GetReservationService>()
 
     routing {
         get<Reservation> { request ->
             println(request.gameType)
-            val query = GetReservationQuery(request.gameType ?: throw Exception())
+            val query = GetReservationQuery(request.storeBranch, request.gameType)
             val result = getReservationService.getReservation(query)
             call.respond(result)
         }
@@ -67,7 +68,10 @@ fun Application.routeReservation() {
 
 @Serializable
 @Resource("/reservation")
-data class Reservation(val gameType: String? = null) {
+data class Reservation(
+    val storeBranch: String,
+    val gameType: String
+) {
 }
 
 @Resource("/reservation/start")
