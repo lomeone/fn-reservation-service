@@ -25,7 +25,7 @@ class ReservationRepositoryImpl(
         return result
     }
 
-    override suspend fun insertOne(reservation: Reservation): Reservation {
+    override suspend fun save(reservation: Reservation): Reservation {
         try {
             val result = mongoDatabase.getCollection<Reservation>(RESERVATION_COLLECTION).insertOne(reservation)
 
