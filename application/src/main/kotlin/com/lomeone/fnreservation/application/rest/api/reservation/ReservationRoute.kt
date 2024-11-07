@@ -1,5 +1,7 @@
 package com.lomeone.fnreservation.application.rest.api.reservation
 
+import com.lomeone.com.lomeone.fnreservation.domain.reservation.service.ReserveCommand
+import com.lomeone.com.lomeone.fnreservation.domain.reservation.service.ReserveService
 import com.lomeone.fnreservation.domain.reservation.repository.ReservationRepository
 import com.lomeone.fnreservation.domain.reservation.service.GetReservationQuery
 import com.lomeone.fnreservation.domain.reservation.service.GetReservationService
@@ -40,21 +42,25 @@ fun Application.routeReservation() {
             single {
                 GetReservationService(get())
             }
+            single {
+                ReserveService(get())
+            }
         })
     }
 
     val startReservationService by inject<StartReservationService>()
     val getReservationService by inject<GetReservationService>()
+    val reserveService by inject<ReserveService>()
 
     routing {
-        get<Reservation> { request ->
+        get<GetReservation> { request ->
             println(request.gameType)
             val query = GetReservationQuery(request.storeBranch, request.gameType)
             val result = getReservationService.getReservation(query)
             call.respond(result)
         }
         post<ReservationStart> {
-            val request = call.receive<ReservationRequest>()
+            val request = call.receive<ReservationStartRequest>()
             val command = StartReservationCommand(
                 storeBranch = request.storeBranch,
                 gameType = request.gameType,
@@ -63,12 +69,23 @@ fun Application.routeReservation() {
             val result = startReservationService.startReservation(command)
             call.respond(result)
         }
+        post<Reservation> {
+            val request = call.receive<ReservationRequest>()
+            val command = ReserveCommand(
+                storeBranch = request.storeBranch,
+                gameType = request.gameType,
+                reservationUsers = request.reservationUsers,
+                reservationTime = request.reservationTime
+            )
+            val result = reserveService.reserve(command)
+            call.respond(result)
+        }
     }
 }
 
 @Serializable
 @Resource("/reservation")
-data class Reservation(
+data class GetReservation(
     val storeBranch: String,
     val gameType: String
 ) {
@@ -78,7 +95,19 @@ data class Reservation(
 class ReservationStart
 
 @Serializable
-data class ReservationRequest(
+data class ReservationStartRequest(
     val storeBranch: String,
     val gameType: String
+)
+
+@Resource("/reservation")
+class Reservation
+
+
+@Serializable
+data class ReservationRequest(
+    val storeBranch: String,
+    val gameType: String,
+    val reservationUsers: Set<String>,
+    val reservationTime: String
 )
