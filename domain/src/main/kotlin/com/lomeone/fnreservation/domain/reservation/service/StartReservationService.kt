@@ -2,7 +2,6 @@ package com.lomeone.fnreservation.domain.reservation.service
 
 import com.lomeone.fnreservation.domain.reservation.entity.Reservation
 import com.lomeone.fnreservation.domain.reservation.repository.ReservationRepository
-import kotlinx.serialization.Serializable
 
 class StartReservationService(
     private val reservationRepository: ReservationRepository
@@ -10,14 +9,12 @@ class StartReservationService(
     suspend fun startReservation(command: StartReservationCommand): StartReservationResult {
         val session = getSessionOfReservation(command)
 
-
-
         val reservation = reservationRepository.save(
-            Reservation(
-            storeBranch = command.storeBranch,
-            gameType = command.gameType,
-            session = session
-        )
+                Reservation(
+                storeBranch = command.storeBranch,
+                gameType = command.gameType,
+                session = session
+            )
         )
 
         return StartReservationResult(
@@ -48,7 +45,6 @@ data class StartReservationCommand(
     val session: Int? = null
 )
 
-@Serializable
 data class StartReservationResult(
     val storeBranch: String,
     val gameType: String,
