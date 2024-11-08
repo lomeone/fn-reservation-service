@@ -59,6 +59,10 @@ subprojects {
         testImplementation("io.ktor:ktor-server-test-host-jvm")
         testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
     }
+
+    tasks.test {
+        useJUnitPlatform()
+    }
 }
 
 fun getGitHash(): String {
