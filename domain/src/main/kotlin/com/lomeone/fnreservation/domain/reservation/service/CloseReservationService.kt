@@ -1,40 +1,36 @@
-package com.lomeone.com.lomeone.fnreservation.domain.reservation.service
+package com.lomeone.fnreservation.domain.reservation.service
 
 import com.lomeone.fnreservation.domain.reservation.repository.ReservationRepository
 
-class ReserveService(
+class CloseReservationService(
     private val reservationRepository: ReservationRepository
 ) {
-    suspend fun reserve(command: ReserveCommand): ReserveResult {
+    suspend fun closeReservation(command: CloseReservationCommand): CloseReservationResult {
         val reservation = reservationRepository.findByStoreBranchAndLatestGameType(command.storeBranch, command.gameType) ?: throw Exception("예약을 찾을 수 없습니다")
 
         if (reservation.isClosed()) {
             throw Exception("예약이 마감되었습니다")
         }
 
-        command.reservationUsers.forEach {
-            reservation.reserve(it, command.reservationTime)
-        }
+        reservation.closeReservation()
 
         val savedReservation = reservationRepository.save(reservation)
 
-        return ReserveResult(
+        return CloseReservationResult(
             storeBranch = savedReservation.storeBranch,
             gameType = savedReservation.gameType,
-            reservation = savedReservation.reservation
+            session = savedReservation.session
         )
     }
 }
 
-data class ReserveCommand(
+data class CloseReservationCommand(
     val storeBranch: String,
-    val gameType: String,
-    val reservationUsers: Set<String>,
-    val reservationTime: String
+    val gameType: String
 )
 
-data class ReserveResult(
+data class CloseReservationResult(
     val storeBranch: String,
     val gameType: String,
-    val reservation: Map<String, String>
+    val session: Int
 )

@@ -3,16 +3,18 @@ package com.lomeone.fnreservation.application.rest.api.reservation
 import io.ktor.resources.*
 import kotlinx.serialization.Serializable
 
-@Resource("/reservation")
+@Resource("/reservation/close")
+class ReservationClose
+
 @Serializable
-data class GetReservation(
+data class ReservationCloseRequest(
     val storeBranch: String,
     val gameType: String
 )
 
 @Serializable
-data class GetReservationResponse(
+data class ReservationCloseResponse(
+    val storeBranch: String,
     val gameType: String,
-    val session: Int,
-    val reservation: Map<String, String>
+    val session: Int
 )

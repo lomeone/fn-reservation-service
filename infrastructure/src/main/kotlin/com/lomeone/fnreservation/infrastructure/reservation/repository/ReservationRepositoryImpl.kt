@@ -46,7 +46,7 @@ class ReservationRepositoryImpl(
                 val updates = Updates.combine(updateList)
 
                 val options = UpdateOptions().upsert(true)
-                return  mongoDatabase.getCollection<Reservation>(RESERVATION_COLLECTION).updateOne(query, updates, options).let { reservation }
+                return mongoDatabase.getCollection<Reservation>(RESERVATION_COLLECTION).updateOne(query, updates, options).let { reservation }
             } else {
                 val result = mongoDatabase.getCollection<Reservation>(RESERVATION_COLLECTION).insertOne(reservation)
 

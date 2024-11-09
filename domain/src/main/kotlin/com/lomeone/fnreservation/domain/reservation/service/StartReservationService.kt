@@ -26,13 +26,13 @@ class StartReservationService(
 
     private suspend fun getSessionOfReservation(command: StartReservationCommand) =
         if (command.session != null) command.session else {
-            val reservation = getReservation(command.gameType)
+            val reservation = getReservation(command)
             checkReservationNotOpen(reservation)
             reservation.session + 1
         }
 
-    private suspend fun getReservation(gameType: String): Reservation =
-        reservationRepository.findByStoreBranchAndLatestGameType("", gameType) ?: throw Exception("예약을 찾을 수 없습니다")
+    private suspend fun getReservation(command: StartReservationCommand): Reservation =
+        reservationRepository.findByStoreBranchAndLatestGameType(command.storeBranch, command.gameType) ?: throw Exception("예약을 찾을 수 없습니다")
 
     private fun checkReservationNotOpen(reservation: Reservation) {
         reservation.isOpen() && throw Exception("아직 예약 중입니다.")
