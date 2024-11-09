@@ -8,6 +8,10 @@ class ReserveService(
     suspend fun reserve(command: ReserveCommand): ReserveResult {
         val reservation = reservationRepository.findByStoreBranchAndLatestGameType(command.storeBranch, command.gameType) ?: throw Exception("예약을 찾을 수 없습니다")
 
+        if (reservation.isClosed()) {
+            throw Exception("예약이 마감되었습니다")
+        }
+
         command.reservationUsers.forEach {
             reservation.reserve(it, command.reservationTime)
         }

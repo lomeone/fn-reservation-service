@@ -3,11 +3,8 @@ package com.lomeone.fnreservation.application.rest.api.reservation
 import com.lomeone.com.lomeone.fnreservation.domain.reservation.service.ReserveCommand
 import com.lomeone.com.lomeone.fnreservation.domain.reservation.service.ReserveService
 import com.lomeone.fnreservation.domain.reservation.repository.ReservationRepository
-import com.lomeone.fnreservation.domain.reservation.service.GetReservationQuery
-import com.lomeone.fnreservation.domain.reservation.service.GetReservationService
-import com.lomeone.fnreservation.domain.reservation.service.StartReservationCommand
-import com.lomeone.fnreservation.domain.reservation.service.StartReservationService
 import com.lomeone.com.lomeone.fnreservation.infrastructure.reservation.repository.ReservationRepositoryImpl
+import com.lomeone.fnreservation.domain.reservation.service.*
 import com.mongodb.kotlin.client.coroutine.MongoClient
 import com.typesafe.config.ConfigFactory
 import io.ktor.server.application.*
@@ -41,6 +38,9 @@ fun Application.routeReservation() {
                 GetReservationService(get())
             }
             single {
+                CloseReservationService(get())
+            }
+            single {
                 ReserveService(get())
             }
         })
@@ -48,6 +48,7 @@ fun Application.routeReservation() {
 
     val startReservationService by inject<StartReservationService>()
     val getReservationService by inject<GetReservationService>()
+    val closeReservationService by inject<CloseReservationService>()
     val reserveService by inject<ReserveService>()
 
     routing {
@@ -58,6 +59,7 @@ fun Application.routeReservation() {
 
             call.respond(GetReservationResponse(
                 gameType = result.gameType,
+                session = result.session,
                 reservation = result.reservation
             ))
         }
@@ -65,12 +67,25 @@ fun Application.routeReservation() {
             val request = call.receive<ReservationStartRequest>()
             val command = StartReservationCommand(
                 storeBranch = request.storeBranch,
-                gameType = request.gameType,
-                24102001
+                gameType = request.gameType
             )
             val result = startReservationService.startReservation(command)
 
             call.respond(ReservationStartResponse(
+                storeBranch = result.storeBranch,
+                gameType = result.gameType,
+                session = result.session
+            ))
+        }
+        post<ReservationClose> {
+            val request = call.receive<ReservationCloseRequest>()
+            val command = CloseReservationCommand(
+                storeBranch = request.storeBranch,
+                gameType = request.gameType
+            )
+            val result = closeReservationService.closeReservation(command)
+
+            call.respond(ReservationCloseResponse(
                 storeBranch = result.storeBranch,
                 gameType = result.gameType,
                 session = result.session

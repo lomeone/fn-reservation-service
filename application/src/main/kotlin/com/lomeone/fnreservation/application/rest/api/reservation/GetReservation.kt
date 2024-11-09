@@ -13,5 +13,6 @@ data class GetReservation(
 @Serializable
 data class GetReservationResponse(
     val gameType: String,
+    val session: Int,
     val reservation: Map<String, String>
 )
