@@ -10,7 +10,6 @@ import com.lomeone.fnreservation.domain.reservation.service.StartReservationServ
 import com.lomeone.com.lomeone.fnreservation.infrastructure.reservation.repository.ReservationRepositoryImpl
 import com.mongodb.kotlin.client.coroutine.MongoClient
 import com.typesafe.config.ConfigFactory
-import io.ktor.resources.*
 import io.ktor.server.application.*
 import io.ktor.server.config.*
 import io.ktor.server.request.*
@@ -18,7 +17,6 @@ import io.ktor.server.resources.*
 import io.ktor.server.resources.post
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.serialization.Serializable
 import org.koin.dsl.module
 import org.koin.ktor.ext.inject
 import org.koin.ktor.plugin.Koin
@@ -57,7 +55,11 @@ fun Application.routeReservation() {
             println(request.gameType)
             val query = GetReservationQuery(request.storeBranch, request.gameType)
             val result = getReservationService.getReservation(query)
-            call.respond(result)
+
+            call.respond(GetReservationResponse(
+                gameType = result.gameType,
+                reservation = result.reservation
+            ))
         }
         post<ReservationStart> {
             val request = call.receive<ReservationStartRequest>()
@@ -67,7 +69,12 @@ fun Application.routeReservation() {
                 24102001
             )
             val result = startReservationService.startReservation(command)
-            call.respond(result)
+
+            call.respond(ReservationStartResponse(
+                storeBranch = result.storeBranch,
+                gameType = result.gameType,
+                session = result.session
+            ))
         }
         post<Reservation> {
             val request = call.receive<ReservationRequest>()
@@ -78,36 +85,12 @@ fun Application.routeReservation() {
                 reservationTime = request.reservationTime
             )
             val result = reserveService.reserve(command)
-            call.respond(result)
+
+            call.respond(ReservationResponse(
+                storeBranch = result.storeBranch,
+                gameType = result.gameType,
+                reservation = result.reservation
+            ))
         }
     }
 }
-
-@Serializable
-@Resource("/reservation")
-data class GetReservation(
-    val storeBranch: String,
-    val gameType: String
-) {
-}
-
-@Resource("/reservation/start")
-class ReservationStart
-
-@Serializable
-data class ReservationStartRequest(
-    val storeBranch: String,
-    val gameType: String
-)
-
-@Resource("/reservation")
-class Reservation
-
-
-@Serializable
-data class ReservationRequest(
-    val storeBranch: String,
-    val gameType: String,
-    val reservationUsers: Set<String>,
-    val reservationTime: String
-)

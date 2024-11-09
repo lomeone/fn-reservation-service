@@ -1,7 +1,6 @@
 package com.lomeone.com.lomeone.fnreservation.domain.reservation.service
 
 import com.lomeone.fnreservation.domain.reservation.repository.ReservationRepository
-import kotlinx.serialization.Serializable
 
 class ReserveService(
     private val reservationRepository: ReservationRepository
@@ -30,7 +29,6 @@ data class ReserveCommand(
     val reservationTime: String
 )
 
-@Serializable
 data class ReserveResult(
     val storeBranch: String,
     val gameType: String,
