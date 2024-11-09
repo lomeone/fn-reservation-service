@@ -43,6 +43,9 @@ fun Application.routeReservation() {
             single {
                 ReserveService(get())
             }
+            single {
+                CancelReservationService(get())
+            }
         })
     }
 
@@ -50,6 +53,7 @@ fun Application.routeReservation() {
     val getReservationService by inject<GetReservationService>()
     val closeReservationService by inject<CloseReservationService>()
     val reserveService by inject<ReserveService>()
+    val cancelReservationService by inject<CancelReservationService>()
 
     routing {
         get<GetReservation> { request ->
@@ -102,6 +106,21 @@ fun Application.routeReservation() {
             val result = reserveService.reserve(command)
 
             call.respond(ReservationResponse(
+                storeBranch = result.storeBranch,
+                gameType = result.gameType,
+                reservation = result.reservation
+            ))
+        }
+        post<CancelReservation> {
+            val request = call.receive<CancelReservationRequest>()
+            val command = CancelCommand(
+                storeBranch = request.storeBranch,
+                gameType = request.gameType,
+                cancelUsers = request.cancelUsers
+            )
+            val result = cancelReservationService.cancel(command)
+
+            call.respond(CancelReservationResponse(
                 storeBranch = result.storeBranch,
                 gameType = result.gameType,
                 reservation = result.reservation
