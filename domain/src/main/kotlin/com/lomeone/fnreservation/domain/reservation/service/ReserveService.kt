@@ -12,12 +12,12 @@ class ReserveService(
             reservation.reserve(it, command.reservationTime)
         }
 
-        reservationRepository.save(reservation)
+        val savedReservation = reservationRepository.save(reservation)
 
         return ReserveResult(
-            storeBranch = reservation.storeBranch,
-            gameType = reservation.gameType,
-            reservation = reservation.reservation
+            storeBranch = savedReservation.storeBranch,
+            gameType = savedReservation.gameType,
+            reservation = savedReservation.reservation
         )
     }
 }
