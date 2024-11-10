@@ -20,14 +20,24 @@ class ReservationRepositoryImpl(
 ) : ReservationRepository {
 
     private val log = LoggerFactory.getLogger(this.javaClass)
-    override suspend fun findByStoreBranchAndLatestGameType(storeBranch: String, gameType: String): Reservation? {
-        val result = mongoDatabase.getCollection<Reservation>(RESERVATION_COLLECTION)
+    override suspend fun findByStoreBranchAndLatestGameType(storeBranch: String, gameType: String): Reservation? =
+        mongoDatabase.getCollection<Reservation>(RESERVATION_COLLECTION)
             .find(and(eq(Reservation::storeBranch.name, storeBranch), eq(Reservation::gameType.name, gameType)))
             .sort(org.bson.Document("createdAt", -1))
             .firstOrNull()
 
-        return result
-    }
+    override suspend fun findByStoreBranchAndGameTypeAndSession(
+        storeBranch: String,
+        gameType: String,
+        session: Int
+    ): Reservation? = mongoDatabase.getCollection<Reservation>(RESERVATION_COLLECTION)
+            .find(and(
+                eq(Reservation::storeBranch.name, storeBranch),
+                eq(Reservation::gameType.name, gameType),
+                eq(Reservation::session.name, session)
+            ))
+            .sort(org.bson.Document("createdAt", -1))
+            .firstOrNull()
 
     override suspend fun save(reservation: Reservation): Reservation {
         try {
