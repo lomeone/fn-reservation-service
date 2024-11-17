@@ -1,12 +1,14 @@
 package com.lomeone.fnreservation.domain.reservation.service
 
+import com.lomeone.fnreservation.domain.reservation.exception.ReservationNotFoundException
 import com.lomeone.fnreservation.domain.reservation.repository.ReservationRepository
 
 class GetReservationService(
     private val reservationRepository: ReservationRepository
 ) {
     suspend fun getReservation(query: GetReservationQuery): GetReservationResult {
-        val reservation = reservationRepository.findByStoreBranchAndLatestGameType(query.storeBranch, query.gameType) ?: throw Exception("예약을 찾을 수 없습니다")
+        val reservation = reservationRepository.findByStoreBranchAndLatestGameType(query.storeBranch, query.gameType)
+            ?: throw ReservationNotFoundException(detail = mapOf("storeBranch" to query.storeBranch, "gameType" to query.gameType))
         return GetReservationResult(
             gameType = reservation.gameType,
             session = reservation.session,
