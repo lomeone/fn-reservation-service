@@ -1,9 +1,9 @@
 package com.lomeone.fnreservation.application.rest.api.reservation
 
-import com.lomeone.com.lomeone.fnreservation.domain.reservation.service.ReserveCommand
-import com.lomeone.com.lomeone.fnreservation.domain.reservation.service.ReserveService
+import com.lomeone.fnreservation.domain.reservation.service.ReserveCommand
+import com.lomeone.fnreservation.domain.reservation.service.ReserveService
 import com.lomeone.fnreservation.domain.reservation.repository.ReservationRepository
-import com.lomeone.com.lomeone.fnreservation.infrastructure.reservation.repository.ReservationRepositoryImpl
+import com.lomeone.fnreservation.infrastructure.reservation.repository.ReservationRepositoryImpl
 import com.lomeone.fnreservation.domain.reservation.service.*
 import com.mongodb.kotlin.client.coroutine.MongoClient
 import com.typesafe.config.ConfigFactory

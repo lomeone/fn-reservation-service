@@ -1,4 +1,4 @@
-package com.lomeone.com.lomeone.fnreservation.infrastructure.reservation.repository
+package com.lomeone.fnreservation.infrastructure.reservation.repository
 
 import com.lomeone.fnreservation.domain.reservation.entity.Reservation
 import com.lomeone.fnreservation.domain.reservation.repository.ReservationRepository
@@ -70,7 +70,9 @@ class ReservationRepositoryImpl(
         }
     }
 
-    private suspend fun isAlreadyExistReservation(reservation: Reservation) = mongoDatabase.getCollection<Reservation>(RESERVATION_COLLECTION)
+    private suspend fun isAlreadyExistReservation(reservation: Reservation) = mongoDatabase.getCollection<Reservation>(
+        RESERVATION_COLLECTION
+    )
         .find(eq("_id", reservation.id))
         .sort(org.bson.Document("createdAt", -1))
         .firstOrNull() != null
