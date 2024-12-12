@@ -1,4 +1,4 @@
-package com.lomeone.com.lomeone.fnreservation.infrastructure.reservation.repository
+package com.lomeone.fnreservation.infrastructure.reservation.repository
 
 import com.lomeone.fnreservation.domain.reservation.entity.Reservation
 import com.lomeone.fnreservation.domain.reservation.repository.ReservationRepository
@@ -20,14 +20,24 @@ class ReservationRepositoryImpl(
 ) : ReservationRepository {
 
     private val log = LoggerFactory.getLogger(this.javaClass)
-    override suspend fun findByStoreBranchAndLatestGameType(storeBranch: String, gameType: String): Reservation? {
-        val result = mongoDatabase.getCollection<Reservation>(RESERVATION_COLLECTION)
+    override suspend fun findByStoreBranchAndLatestGameType(storeBranch: String, gameType: String): Reservation? =
+        mongoDatabase.getCollection<Reservation>(RESERVATION_COLLECTION)
             .find(and(eq(Reservation::storeBranch.name, storeBranch), eq(Reservation::gameType.name, gameType)))
             .sort(org.bson.Document("createdAt", -1))
             .firstOrNull()
 
-        return result
-    }
+    override suspend fun findByStoreBranchAndGameTypeAndSession(
+        storeBranch: String,
+        gameType: String,
+        session: Int
+    ): Reservation? = mongoDatabase.getCollection<Reservation>(RESERVATION_COLLECTION)
+            .find(and(
+                eq(Reservation::storeBranch.name, storeBranch),
+                eq(Reservation::gameType.name, gameType),
+                eq(Reservation::session.name, session)
+            ))
+            .sort(org.bson.Document("createdAt", -1))
+            .firstOrNull()
 
     override suspend fun save(reservation: Reservation): Reservation {
         try {
@@ -60,7 +70,9 @@ class ReservationRepositoryImpl(
         }
     }
 
-    private suspend fun isAlreadyExistReservation(reservation: Reservation) = mongoDatabase.getCollection<Reservation>(RESERVATION_COLLECTION)
+    private suspend fun isAlreadyExistReservation(reservation: Reservation) = mongoDatabase.getCollection<Reservation>(
+        RESERVATION_COLLECTION
+    )
         .find(eq("_id", reservation.id))
         .sort(org.bson.Document("createdAt", -1))
         .firstOrNull() != null

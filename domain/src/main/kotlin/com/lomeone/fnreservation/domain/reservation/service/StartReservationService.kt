@@ -20,16 +20,26 @@ class StartReservationService(
         return StartReservationResult(
             storeBranch = reservation.storeBranch,
             gameType = reservation.gameType,
-            session = reservation.session
+            session = reservation.session,
+            reservation = reservation.reservation
         )
     }
 
     private suspend fun getSessionOfReservation(command: StartReservationCommand) =
-        if (command.session != null) command.session else {
+        if (command.session != null) {
+            ensureSessionIsNotDuplicated(command.storeBranch, command.gameType, command.session)
+            command.session
+        } else {
             val reservation = getReservation(command)
             checkReservationNotOpen(reservation)
             reservation.session + 1
         }
+
+    private suspend fun ensureSessionIsNotDuplicated(storeBranch: String, gameType: String, session: Int) {
+        if (reservationRepository.findByStoreBranchAndGameTypeAndSession(storeBranch, gameType, session) != null) {
+            throw Exception("이미 예약된 세션입니다.")
+        }
+    }
 
     private suspend fun getReservation(command: StartReservationCommand): Reservation =
         reservationRepository.findByStoreBranchAndLatestGameType(command.storeBranch, command.gameType) ?: throw Exception("예약을 찾을 수 없습니다")
@@ -48,5 +58,6 @@ data class StartReservationCommand(
 data class StartReservationResult(
     val storeBranch: String,
     val gameType: String,
-    val session: Int
+    val session: Int,
+    val reservation: Map<String, String>
 )
