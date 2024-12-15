@@ -69,11 +69,13 @@ fun Application.routeReservation() {
         }
         post<ReservationStart> {
             val request = call.receive<ReservationStartRequest>()
+
             val command = StartReservationCommand(
                 storeBranch = request.storeBranch,
                 gameType = request.gameType,
                 session = request.session
             )
+
             val result = startReservationService.startReservation(command)
 
             call.respond(ReservationStartResponse(
