@@ -87,10 +87,12 @@ fun Application.routeReservation() {
         }
         post<ReservationClose> {
             val request = call.receive<ReservationCloseRequest>()
+
             val command = CloseReservationCommand(
                 storeBranch = request.storeBranch,
                 gameType = request.gameType
             )
+
             val result = closeReservationService.closeReservation(command)
 
             call.respond(ReservationCloseResponse(
