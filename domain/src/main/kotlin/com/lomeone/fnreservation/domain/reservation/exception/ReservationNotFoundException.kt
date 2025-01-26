@@ -6,10 +6,10 @@ import com.lomeone.eunoia.exception.ExceptionCategory
 import com.lomeone.eunoia.exception.ExceptionDetail
 
 private val ERROR_CODE = ErrorCode(
-    code = "user/deletion-request-not-found",
+    code = "reservation/not-found",
     exceptionCategory = ExceptionCategory.NOT_FOUND
 )
-private const val MESSAGE = "Deletion request not found"
+private const val MESSAGE = "Reservation not found"
 
 class ReservationNotFoundException(
     detail: Map<String, Any>
