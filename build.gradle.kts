@@ -24,8 +24,8 @@ allprojects {
         maven {
             url = uri("https://maven.pkg.github.com/lomeone/eunoia")
             credentials {
-                username = project.findProperty("gpr.user") as String? ?: "comstering"
-                password = project.findProperty("gpr.key") as String? ?: ""
+                username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_USER")
+                password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
             }
         }
     }
