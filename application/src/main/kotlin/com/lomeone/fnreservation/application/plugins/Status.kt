@@ -4,8 +4,8 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
-import org.example.com.lomeone.eunoia.exception.EunioaException
-import org.example.com.lomeone.eunoia.exception.ExceptionCategory
+import com.lomeone.eunoia.exception.EunioaException
+import com.lomeone.eunoia.exception.ExceptionCategory
 
 fun Application.configureStatus() {
     install(StatusPages) {
