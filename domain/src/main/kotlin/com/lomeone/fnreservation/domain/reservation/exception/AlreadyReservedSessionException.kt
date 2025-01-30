@@ -5,13 +5,13 @@ import com.lomeone.eunoia.exception.EunioaException
 import com.lomeone.eunoia.exception.ExceptionCategory
 import com.lomeone.eunoia.exception.ExceptionDetail
 
-private const val MESSAGE = "Reservation not found"
+private const val MESSAGE = "Already reserved session"
 private val ERROR_CODE = ErrorCode(
-    code = "reservation/not-found",
-    exceptionCategory = ExceptionCategory.NOT_FOUND
+    code = "reservation/already-reserved-session",
+    exceptionCategory = ExceptionCategory.BAD_REQUEST
 )
 
-class ReservationNotFoundException(
+class AlreadyReservedSessionException(
     detail: Map<String, Any>
 ) : EunioaException(
     message = MESSAGE,

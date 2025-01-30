@@ -5,11 +5,11 @@ import com.lomeone.eunoia.exception.EunioaException
 import com.lomeone.eunoia.exception.ExceptionCategory
 import com.lomeone.eunoia.exception.ExceptionDetail
 
+private const val MESSAGE = "Reservation closed"
 private val ERROR_CODE = ErrorCode(
     code = "reservation/closed",
     exceptionCategory = ExceptionCategory.BAD_REQUEST
 )
-private const val MESSAGE = "Reservation closed"
 
 class ReservationClosedException(
     detail: Map<String, Any>
