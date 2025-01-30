@@ -7,7 +7,7 @@ import com.lomeone.fnreservation.domain.reservation.repository.ReservationReposi
 class CloseReservationService(
     private val reservationRepository: ReservationRepository
 ) {
-    suspend fun closeReservation(command: CloseReservationCommand): CloseReservationResult {
+    fun closeReservation(command: CloseReservationCommand): CloseReservationResult {
         val reservation = reservationRepository.findByStoreBranchAndLatestGameType(command.storeBranch, command.gameType) ?: throw Exception("예약을 찾을 수 없습니다")
 
         ensureReservationOpened(reservation)

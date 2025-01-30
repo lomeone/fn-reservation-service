@@ -6,7 +6,7 @@ import com.lomeone.fnreservation.domain.reservation.repository.ReservationReposi
 class GetReservationService(
     private val reservationRepository: ReservationRepository
 ) {
-    suspend fun getReservation(query: GetReservationQuery): GetReservationResult {
+    fun getReservation(query: GetReservationQuery): GetReservationResult {
         val reservation = reservationRepository.findByStoreBranchAndLatestGameType(query.storeBranch, query.gameType)
             ?: throw ReservationNotFoundException(detail = mapOf("storeBranch" to query.storeBranch, "gameType" to query.gameType))
         return GetReservationResult(
