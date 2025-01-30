@@ -119,7 +119,7 @@ fun Application.routeReservation() {
         }
         post<CancelReservation> {
             val request = call.receive<CancelReservationRequest>()
-            val command = CancelCommand(
+            val command = CancelReservationCommand(
                 storeBranch = request.storeBranch,
                 gameType = request.gameType,
                 cancelUsers = request.cancelUsers
