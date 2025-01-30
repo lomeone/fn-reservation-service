@@ -8,7 +8,7 @@ import com.lomeone.fnreservation.domain.reservation.repository.ReservationReposi
 class StartReservationService(
     private val reservationRepository: ReservationRepository
 ) {
-    suspend fun startReservation(command: StartReservationCommand): StartReservationResult {
+    fun startReservation(command: StartReservationCommand): StartReservationResult {
         val session = getSessionOfReservation(command)
 
         val reservation = reservationRepository.save(
@@ -27,7 +27,7 @@ class StartReservationService(
         )
     }
 
-    private suspend fun getSessionOfReservation(command: StartReservationCommand) =
+    private fun getSessionOfReservation(command: StartReservationCommand) =
         if (command.session != null) {
             ensureUniqueSession(command.storeBranch, command.gameType, command.session)
             command.session
@@ -37,7 +37,7 @@ class StartReservationService(
             reservation.session + 1
         }
 
-    private suspend fun ensureUniqueSession(storeBranch: String, gameType: String, session: Int) {
+    private fun ensureUniqueSession(storeBranch: String, gameType: String, session: Int) {
         if (reservationRepository.findByStoreBranchAndGameTypeAndSession(storeBranch, gameType, session) != null) {
             throw AlreadyReservedSessionException(
                 detail = mapOf(
@@ -49,7 +49,7 @@ class StartReservationService(
         }
     }
 
-    private suspend fun getReservation(command: StartReservationCommand): Reservation =
+    private fun getReservation(command: StartReservationCommand): Reservation =
         reservationRepository.findByStoreBranchAndLatestGameType(command.storeBranch, command.gameType) ?: throw Exception("예약을 찾을 수 없습니다")
 
     private fun ensureReservationClosed(reservation: Reservation) {

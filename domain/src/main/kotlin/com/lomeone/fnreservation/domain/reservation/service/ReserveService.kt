@@ -8,7 +8,7 @@ import com.lomeone.fnreservation.domain.reservation.repository.ReservationReposi
 class ReserveService(
     private val reservationRepository: ReservationRepository
 ) {
-    suspend fun reserve(command: ReserveCommand): ReserveResult {
+    fun reserve(command: ReserveCommand): ReserveResult {
         val reservation = reservationRepository.findByStoreBranchAndLatestGameType(command.storeBranch, command.gameType)
             ?: throw ReservationNotFoundException(detail = mapOf("storeBranch" to command.storeBranch, "gameType" to command.gameType))
 
