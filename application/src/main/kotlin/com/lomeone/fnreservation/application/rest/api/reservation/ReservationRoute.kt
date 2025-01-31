@@ -112,8 +112,8 @@ fun Application.routeReservation() {
             val result = reserveService.reserve(command)
 
             call.respond(ReservationResponse(
-                storeBranch = result.storeBranch,
                 gameType = result.gameType,
+                session = result.session,
                 reservation = result.reservation
             ))
         }

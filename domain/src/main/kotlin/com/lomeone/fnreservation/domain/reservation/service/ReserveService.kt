@@ -21,8 +21,8 @@ class ReserveService(
         val savedReservation = reservationRepository.save(reservation)
 
         return ReserveResult(
-            storeBranch = savedReservation.storeBranch,
             gameType = savedReservation.gameType,
+            session = savedReservation.session,
             reservation = savedReservation.reservation
         )
     }
@@ -46,7 +46,7 @@ data class ReserveCommand(
 )
 
 data class ReserveResult(
-    val storeBranch: String,
     val gameType: String,
+    val session: Int,
     val reservation: Map<String, String>
 )
