@@ -19,8 +19,8 @@ class CancelReservationService(
         val savedReservation = reservationRepository.save(reservation)
 
         return CancelReservationResult(
-            storeBranch = savedReservation.storeBranch,
             gameType = savedReservation.gameType,
+            session = savedReservation.session,
             reservation = savedReservation.reservation
         )
     }
@@ -43,7 +43,7 @@ data class CancelReservationCommand(
 )
 
 data class CancelReservationResult(
-    val storeBranch: String,
     val gameType: String,
+    val session: Int,
     val reservation: Map<String, String>
 )

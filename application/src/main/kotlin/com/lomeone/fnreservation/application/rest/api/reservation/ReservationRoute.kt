@@ -127,8 +127,8 @@ fun Application.routeReservation() {
             val result = cancelReservationService.cancel(command)
 
             call.respond(CancelReservationResponse(
-                storeBranch = result.storeBranch,
                 gameType = result.gameType,
+                session = result.session,
                 reservation = result.reservation
             ))
         }
