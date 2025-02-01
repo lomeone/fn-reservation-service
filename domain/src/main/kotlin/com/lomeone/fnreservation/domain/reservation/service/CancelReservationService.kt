@@ -2,13 +2,14 @@ package com.lomeone.fnreservation.domain.reservation.service
 
 import com.lomeone.fnreservation.domain.reservation.entity.Reservation
 import com.lomeone.fnreservation.domain.reservation.exception.ReservationClosedException
+import com.lomeone.fnreservation.domain.reservation.exception.ReservationNotFoundException
 import com.lomeone.fnreservation.domain.reservation.repository.ReservationRepository
 
 class CancelReservationService(
     private val reservationRepository: ReservationRepository
 ) {
     fun cancel(command: CancelReservationCommand): CancelReservationResult {
-        val reservation = reservationRepository.findByStoreBranchAndLatestGameType(command.storeBranch, command.gameType) ?: throw Exception("예약을 찾을 수 없습니다")
+        val reservation = getReservation(command)
 
         ensureReservationOpened(reservation)
 
@@ -24,6 +25,10 @@ class CancelReservationService(
             reservation = savedReservation.reservation
         )
     }
+
+    private fun getReservation(command: CancelReservationCommand): Reservation =
+        reservationRepository.findByStoreBranchAndLatestGameType(command.storeBranch, command.gameType)
+            ?: throw ReservationNotFoundException(detail = mapOf("storeBranch" to command.storeBranch, "gameType" to command.gameType))
 
     private fun ensureReservationOpened(reservation: Reservation) {
         reservation.isClosed() && throw ReservationClosedException(
