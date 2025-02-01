@@ -9,8 +9,7 @@ class ReserveService(
     private val reservationRepository: ReservationRepository
 ) {
     fun reserve(command: ReserveCommand): ReserveResult {
-        val reservation = reservationRepository.findByStoreBranchAndLatestGameType(command.storeBranch, command.gameType)
-            ?: throw ReservationNotFoundException(detail = mapOf("storeBranch" to command.storeBranch, "gameType" to command.gameType))
+        val reservation = getReservation(command)
 
         ensureReservationOpen(reservation)
 
@@ -26,6 +25,10 @@ class ReserveService(
             reservation = savedReservation.reservation
         )
     }
+
+    private fun getReservation(command: ReserveCommand): Reservation =
+        reservationRepository.findByStoreBranchAndLatestGameType(command.storeBranch, command.gameType)
+            ?: throw ReservationNotFoundException(detail = mapOf("storeBranch" to command.storeBranch, "gameType" to command.gameType))
 
     private fun ensureReservationOpen(reservation: Reservation) {
         reservation.isClosed() && throw ReservationClosedException(
