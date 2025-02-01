@@ -1,5 +1,6 @@
 package com.lomeone.fnreservation.domain.reservation.service
 
+import com.lomeone.fnreservation.domain.reservation.entity.ReservationStatus
 import com.lomeone.fnreservation.domain.reservation.exception.ReservationNotFoundException
 import com.lomeone.fnreservation.domain.reservation.repository.ReservationRepository
 
@@ -12,7 +13,8 @@ class GetReservationService(
         return GetReservationResult(
             gameType = reservation.gameType,
             session = reservation.session,
-            reservation = reservation.reservation
+            reservation = reservation.reservation,
+            status = reservation.status
         )
     }
 }
@@ -25,5 +27,6 @@ data class GetReservationQuery(
 data class GetReservationResult(
     val gameType: String,
     val session: Int,
-    val reservation: Map<String, String>
+    val reservation: Map<String, String>,
+    val status: ReservationStatus
 )

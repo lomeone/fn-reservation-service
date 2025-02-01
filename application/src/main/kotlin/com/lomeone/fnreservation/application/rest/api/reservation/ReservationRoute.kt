@@ -64,7 +64,8 @@ fun Application.routeReservation() {
             call.respond(GetReservationResponse(
                 gameType = result.gameType,
                 session = result.session,
-                reservation = result.reservation
+                reservation = result.reservation,
+                status = result.status.name
             ))
         }
         post<ReservationStart> {
