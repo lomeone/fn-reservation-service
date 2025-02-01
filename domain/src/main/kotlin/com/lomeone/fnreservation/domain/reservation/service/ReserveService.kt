@@ -9,7 +9,7 @@ class ReserveService(
     private val reservationRepository: ReservationRepository
 ) {
     fun reserve(command: ReserveCommand): ReserveResult {
-        val reservation = getReservation(command)
+        val reservation = findReservation(command)
 
         ensureReservationOpen(reservation)
 
@@ -26,7 +26,7 @@ class ReserveService(
         )
     }
 
-    private fun getReservation(command: ReserveCommand): Reservation =
+    private fun findReservation(command: ReserveCommand): Reservation =
         reservationRepository.findByStoreBranchAndLatestGameType(command.storeBranch, command.gameType)
             ?: throw ReservationNotFoundException(detail = mapOf("storeBranch" to command.storeBranch, "gameType" to command.gameType))
 

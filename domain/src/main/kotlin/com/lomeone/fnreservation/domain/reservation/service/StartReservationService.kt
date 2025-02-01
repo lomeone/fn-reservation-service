@@ -3,6 +3,7 @@ package com.lomeone.fnreservation.domain.reservation.service
 import com.lomeone.fnreservation.domain.reservation.entity.Reservation
 import com.lomeone.fnreservation.domain.reservation.exception.AlreadyReservedSessionException
 import com.lomeone.fnreservation.domain.reservation.exception.ReservationInProgressException
+import com.lomeone.fnreservation.domain.reservation.exception.ReservationNotFoundException
 import com.lomeone.fnreservation.domain.reservation.repository.ReservationRepository
 
 class StartReservationService(
@@ -32,7 +33,7 @@ class StartReservationService(
             ensureUniqueSession(command.storeBranch, command.gameType, command.session)
             command.session
         } else {
-            val reservation = getReservation(command)
+            val reservation = findReservation(command)
             ensureReservationClosed(reservation)
             reservation.session + 1
         }
@@ -49,8 +50,9 @@ class StartReservationService(
         }
     }
 
-    private fun getReservation(command: StartReservationCommand): Reservation =
-        reservationRepository.findByStoreBranchAndLatestGameType(command.storeBranch, command.gameType) ?: throw Exception("예약을 찾을 수 없습니다")
+    private fun findReservation(command: StartReservationCommand): Reservation =
+        reservationRepository.findByStoreBranchAndLatestGameType(command.storeBranch, command.gameType)
+            ?: throw ReservationNotFoundException(detail = mapOf("storeBranch" to command.storeBranch, "gameType" to command.gameType))
 
     private fun ensureReservationClosed(reservation: Reservation) {
         reservation.isOpen() && throw ReservationInProgressException(

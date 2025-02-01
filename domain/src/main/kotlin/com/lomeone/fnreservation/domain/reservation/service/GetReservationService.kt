@@ -8,8 +8,8 @@ class GetReservationService(
     private val reservationRepository: ReservationRepository
 ) {
     fun getReservation(query: GetReservationQuery): GetReservationResult {
-        val reservation = reservationRepository.findByStoreBranchAndLatestGameType(query.storeBranch, query.gameType)
-            ?: throw ReservationNotFoundException(detail = mapOf("storeBranch" to query.storeBranch, "gameType" to query.gameType))
+        val reservation = findReservation(query)
+
         return GetReservationResult(
             gameType = reservation.gameType,
             session = reservation.session,
@@ -17,6 +17,10 @@ class GetReservationService(
             status = reservation.status
         )
     }
+
+    private fun findReservation(query: GetReservationQuery) =
+        reservationRepository.findByStoreBranchAndLatestGameType(query.storeBranch, query.gameType)
+            ?: throw ReservationNotFoundException(detail = mapOf("storeBranch" to query.storeBranch, "gameType" to query.gameType))
 }
 
 data class GetReservationQuery(

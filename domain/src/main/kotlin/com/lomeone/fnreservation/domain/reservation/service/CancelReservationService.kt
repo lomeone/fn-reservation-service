@@ -9,7 +9,7 @@ class CancelReservationService(
     private val reservationRepository: ReservationRepository
 ) {
     fun cancel(command: CancelReservationCommand): CancelReservationResult {
-        val reservation = getReservation(command)
+        val reservation = findReservation(command)
 
         ensureReservationOpened(reservation)
 
@@ -26,7 +26,7 @@ class CancelReservationService(
         )
     }
 
-    private fun getReservation(command: CancelReservationCommand): Reservation =
+    private fun findReservation(command: CancelReservationCommand): Reservation =
         reservationRepository.findByStoreBranchAndLatestGameType(command.storeBranch, command.gameType)
             ?: throw ReservationNotFoundException(detail = mapOf("storeBranch" to command.storeBranch, "gameType" to command.gameType))
 
