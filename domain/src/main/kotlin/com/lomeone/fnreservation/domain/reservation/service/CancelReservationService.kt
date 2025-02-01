@@ -2,13 +2,14 @@ package com.lomeone.fnreservation.domain.reservation.service
 
 import com.lomeone.fnreservation.domain.reservation.entity.Reservation
 import com.lomeone.fnreservation.domain.reservation.exception.ReservationClosedException
+import com.lomeone.fnreservation.domain.reservation.exception.ReservationNotFoundException
 import com.lomeone.fnreservation.domain.reservation.repository.ReservationRepository
 
 class CancelReservationService(
     private val reservationRepository: ReservationRepository
 ) {
     fun cancel(command: CancelReservationCommand): CancelReservationResult {
-        val reservation = reservationRepository.findByStoreBranchAndLatestGameType(command.storeBranch, command.gameType) ?: throw Exception("예약을 찾을 수 없습니다")
+        val reservation = findReservation(command)
 
         ensureReservationOpened(reservation)
 
@@ -19,11 +20,15 @@ class CancelReservationService(
         val savedReservation = reservationRepository.save(reservation)
 
         return CancelReservationResult(
-            storeBranch = savedReservation.storeBranch,
             gameType = savedReservation.gameType,
+            session = savedReservation.session,
             reservation = savedReservation.reservation
         )
     }
+
+    private fun findReservation(command: CancelReservationCommand): Reservation =
+        reservationRepository.findByStoreBranchAndLatestGameType(command.storeBranch, command.gameType)
+            ?: throw ReservationNotFoundException(detail = mapOf("storeBranch" to command.storeBranch, "gameType" to command.gameType))
 
     private fun ensureReservationOpened(reservation: Reservation) {
         reservation.isClosed() && throw ReservationClosedException(
@@ -43,7 +48,7 @@ data class CancelReservationCommand(
 )
 
 data class CancelReservationResult(
-    val storeBranch: String,
     val gameType: String,
+    val session: Int,
     val reservation: Map<String, String>
 )

@@ -64,7 +64,8 @@ fun Application.routeReservation() {
             call.respond(GetReservationResponse(
                 gameType = result.gameType,
                 session = result.session,
-                reservation = result.reservation
+                reservation = result.reservation,
+                status = result.status.name
             ))
         }
         post<ReservationStart> {
@@ -112,8 +113,8 @@ fun Application.routeReservation() {
             val result = reserveService.reserve(command)
 
             call.respond(ReservationResponse(
-                storeBranch = result.storeBranch,
                 gameType = result.gameType,
+                session = result.session,
                 reservation = result.reservation
             ))
         }
@@ -127,8 +128,8 @@ fun Application.routeReservation() {
             val result = cancelReservationService.cancel(command)
 
             call.respond(CancelReservationResponse(
-                storeBranch = result.storeBranch,
                 gameType = result.gameType,
+                session = result.session,
                 reservation = result.reservation
             ))
         }

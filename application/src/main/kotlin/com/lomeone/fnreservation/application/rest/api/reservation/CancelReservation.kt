@@ -15,7 +15,7 @@ data class CancelReservationRequest(
 
 @Serializable
 data class CancelReservationResponse(
-    val storeBranch: String,
     val gameType: String,
+    val session: Int,
     val reservation: Map<String, String>
 )

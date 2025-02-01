@@ -14,5 +14,6 @@ data class GetReservation(
 data class GetReservationResponse(
     val gameType: String,
     val session: Int,
-    val reservation: Map<String, String>
+    val reservation: Map<String, String>,
+    val status: String
 )
