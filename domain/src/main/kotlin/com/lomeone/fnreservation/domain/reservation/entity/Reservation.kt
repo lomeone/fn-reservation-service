@@ -12,7 +12,7 @@ data class Reservation(
     val gameType: String,
     val session: Int,
     @BsonProperty("reservation")
-    val _reservation: MutableMap<String, String> = mutableMapOf(),
+    val _reservation: LinkedHashMap<String, String> = linkedMapOf(),
     var status: ReservationStatus = ReservationStatus.OPEN,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime = LocalDateTime.now()
