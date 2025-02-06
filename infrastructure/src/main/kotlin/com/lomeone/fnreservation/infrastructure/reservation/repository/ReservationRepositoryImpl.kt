@@ -21,6 +21,7 @@ class ReservationRepositoryImpl(
 ) : ReservationRepository {
 
     private val log = LoggerFactory.getLogger(this.javaClass)
+
     override fun findByStoreBranchAndLatestGameType(storeBranch: String, gameType: String): Reservation? =
         runBlocking {
             mongoDatabase.getCollection<Reservation>(RESERVATION_COLLECTION)
