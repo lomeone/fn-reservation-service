@@ -5,7 +5,7 @@ import com.lomeone.fnreservation.domain.reservation.service.ReserveService
 import com.lomeone.fnreservation.domain.reservation.repository.ReservationRepository
 import com.lomeone.fnreservation.infrastructure.reservation.repository.ReservationRepositoryImpl
 import com.lomeone.fnreservation.domain.reservation.service.*
-import com.mongodb.kotlin.client.coroutine.MongoClient
+import com.lomeone.fnreservation.infrastructure.database.mongodb.MongoConfig
 import com.typesafe.config.ConfigFactory
 import io.ktor.server.application.*
 import io.ktor.server.config.*
@@ -22,11 +22,8 @@ fun Application.routeReservation() {
     val infrastructureConfig = HoconApplicationConfig(ConfigFactory.load("infrastructure.conf"))
     install(Koin) {
         modules(module {
-            single<MongoClient> {
-                MongoClient.create(infrastructureConfig.property("ktor.mongo.uri").getString())
-            }
             single {
-                get<MongoClient>().getDatabase(infrastructureConfig.property("ktor.mongo.database").getString())
+                MongoConfig.getMongoDatabase(infrastructureConfig.property("ktor.mongo.database").getString())
             }
         }, module {
             single<ReservationRepository> { ReservationRepositoryImpl(get()) }
