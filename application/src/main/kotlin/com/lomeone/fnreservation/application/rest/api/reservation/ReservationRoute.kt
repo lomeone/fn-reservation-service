@@ -57,7 +57,6 @@ fun Application.routeReservation() {
 
     routing {
         get<GetReservation> { request ->
-            println(request.gameType)
             val query = GetReservationQuery(request.storeBranch, request.gameType)
             val result = getReservationService.getReservation(query)
 
