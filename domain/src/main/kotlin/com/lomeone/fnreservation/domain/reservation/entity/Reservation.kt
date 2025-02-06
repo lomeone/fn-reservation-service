@@ -1,17 +1,21 @@
-package com.lomeone.com.lomeone.domain.reservation.entity
+package com.lomeone.fnreservation.domain.reservation.entity
 
 import org.bson.codecs.pojo.annotations.BsonId
 import org.bson.codecs.pojo.annotations.BsonProperty
 import org.bson.types.ObjectId
+import java.time.LocalDateTime
 
 data class Reservation(
     @BsonId
     val id: ObjectId = ObjectId(),
+    val storeBranch: String,
     val gameType: String,
     val session: Int,
     @BsonProperty("reservation")
-    val _reservation: MutableMap<String, String> = mutableMapOf(),
-    var status: ReservationStatus = ReservationStatus.OPEN
+    val _reservation: LinkedHashMap<String, String> = linkedMapOf(),
+    var status: ReservationStatus = ReservationStatus.OPEN,
+    val createdAt: LocalDateTime = LocalDateTime.now(),
+    val updatedAt: LocalDateTime = LocalDateTime.now()
 ) {
     val reservation: Map<String, String>
         get() = this._reservation.toMap()

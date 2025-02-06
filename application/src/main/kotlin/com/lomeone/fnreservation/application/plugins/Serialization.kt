@@ -1,4 +1,4 @@
-package com.lomeone.application.plugins
+package com.lomeone.fnreservation.application.plugins
 
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*

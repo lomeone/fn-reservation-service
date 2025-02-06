@@ -1,7 +1,4 @@
 dependencies {
     implementation(project(":domain"))
-}
-
-tasks.test {
-    useJUnitPlatform()
+    implementation(kotlin("reflect"))
 }

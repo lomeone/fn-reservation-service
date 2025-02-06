@@ -3,12 +3,10 @@ import java.io.ByteArrayOutputStream
 val group_name: String by project
 
 val logback_version: String by project
-val prometheus_version: String by project
-val swagger_version: String by project
+val eunoia_exception_version: String by project
 
 plugins {
     kotlin("jvm")
-    id("io.ktor.plugin")
     id("org.jetbrains.kotlin.plugin.serialization")
 }
 
@@ -18,12 +16,18 @@ allprojects {
 
     apply {
         plugin("kotlin")
-        plugin("io.ktor.plugin")
         plugin("org.jetbrains.kotlin.plugin.serialization")
     }
 
     repositories {
         mavenCentral()
+        maven {
+            url = uri("https://maven.pkg.github.com/lomeone/eunoia")
+            credentials {
+                username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_USER")
+                password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
     }
 }
 
@@ -42,22 +46,18 @@ subprojects {
     }
 
     dependencies {
-        // ktor
-        implementation("io.ktor:ktor-server-core-jvm")
-        implementation("io.ktor:ktor-server-resources-jvm")
-        implementation("io.ktor:ktor-server-call-logging-jvm")
-
         // MongoDB
         implementation("org.mongodb:mongodb-driver-kotlin-coroutine:4.10.1")
 
-        implementation("io.ktor:ktor-server-metrics-micrometer-jvm")
-        implementation("io.micrometer:micrometer-registry-prometheus:$prometheus_version")
-        implementation("io.ktor:ktor-server-content-negotiation-jvm")
-        implementation("io.ktor:ktor-serialization-kotlinx-json-jvm")
-        implementation("io.ktor:ktor-server-netty-jvm")
         implementation("ch.qos.logback:logback-classic:$logback_version")
-        testImplementation("io.ktor:ktor-server-test-host-jvm")
+
+        implementation("com.lomeone.eunoia:exception:$eunoia_exception_version")
+
         testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
+    }
+
+    tasks.test {
+        useJUnitPlatform()
     }
 }
 
