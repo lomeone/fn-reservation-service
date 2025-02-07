@@ -1,0 +1,6 @@
+fn-reservation-service v1.1.0 Release Notes
+===========================================
+
+* New Feature
+1. Implement use secrets manager
+2. Remove Mongodb connecting info
