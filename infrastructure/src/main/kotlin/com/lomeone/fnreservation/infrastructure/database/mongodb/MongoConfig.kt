@@ -16,7 +16,7 @@ object MongoConfig {
     private fun getMongodbUri(): String {
         val valueRequest =
             GetSecretValueRequest {
-                secretId = "mongodb-uri"
+                secretId = "/prod/fn-reservation-service/mongodb"
             }
 
         val response = SecretsManagerConfig.getSecretValue(valueRequest)
