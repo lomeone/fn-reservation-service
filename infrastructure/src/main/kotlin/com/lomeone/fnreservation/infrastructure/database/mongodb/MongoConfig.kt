@@ -11,8 +11,6 @@ object MongoConfig {
         MongoClient.create(uri)
     }
 
-    fun getMongoDatabase(database: String): MongoDatabase = mongoClient.getDatabase(database)
-
     private fun getMongodbUri(): String {
         val valueRequest =
             GetSecretValueRequest {
@@ -23,6 +21,8 @@ object MongoConfig {
 
         return response.secretString ?: throw Exception()
     }
+
+    fun getMongoDatabase(database: String): MongoDatabase = mongoClient.getDatabase(database)
 
     fun close() {
         mongoClient.close()
