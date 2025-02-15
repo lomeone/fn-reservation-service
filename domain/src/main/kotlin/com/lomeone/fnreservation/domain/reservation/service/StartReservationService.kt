@@ -13,7 +13,7 @@ class StartReservationService(
         val session = getSessionOfReservation(command)
 
         val reservation = reservationRepository.save(
-                Reservation(
+            Reservation(
                 storeBranch = command.storeBranch,
                 gameType = command.gameType,
                 session = session
@@ -39,15 +39,14 @@ class StartReservationService(
         }
 
     private fun ensureUniqueSession(storeBranch: String, gameType: String, session: Int) {
-        if (reservationRepository.findByStoreBranchAndGameTypeAndSession(storeBranch, gameType, session) != null) {
-            throw AlreadyReservedSessionException(
-                detail = mapOf(
-                    "storeBranch" to storeBranch,
-                    "gameType" to gameType,
-                    "session" to session
+        reservationRepository.findByStoreBranchAndGameTypeAndSession(storeBranch, gameType, session) != null &&
+                throw AlreadyReservedSessionException(
+                    detail = mapOf(
+                        "storeBranch" to storeBranch,
+                        "gameType" to gameType,
+                        "session" to session
+                    )
                 )
-            )
-        }
     }
 
     private fun findReservation(command: StartReservationCommand): Reservation =
