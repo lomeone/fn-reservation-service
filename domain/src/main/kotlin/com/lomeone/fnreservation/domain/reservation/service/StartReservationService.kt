@@ -13,7 +13,7 @@ class StartReservationService(
         val session = getSessionOfReservation(command)
 
         val reservation = reservationRepository.save(
-                Reservation(
+            Reservation(
                 storeBranch = command.storeBranch,
                 gameType = command.gameType,
                 session = session
