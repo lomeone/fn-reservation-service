@@ -3,8 +3,7 @@ package com.lomeone.fnreservation.infrastructure.reservation.repository
 import com.lomeone.fnreservation.domain.reservation.entity.Reservation
 import com.lomeone.fnreservation.domain.reservation.repository.ReservationRepository
 import com.mongodb.MongoException
-import com.mongodb.client.model.Filters.and
-import com.mongodb.client.model.Filters.eq
+import com.mongodb.client.model.Filters.*
 import com.mongodb.client.model.UpdateOptions
 import com.mongodb.client.model.Updates
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
@@ -14,7 +13,7 @@ import org.bson.conversions.Bson
 import org.slf4j.LoggerFactory
 import kotlin.reflect.full.memberProperties
 
-const val RESERVATION_COLLECTION = "reservation"
+private const val RESERVATION_COLLECTION = "reservation"
 
 class ReservationRepositoryImpl(
     private val mongoDatabase: MongoDatabase
@@ -25,7 +24,11 @@ class ReservationRepositoryImpl(
     override fun findByStoreBranchAndLatestGameType(storeBranch: String, gameType: String): Reservation? =
         runBlocking {
             mongoDatabase.getCollection<Reservation>(RESERVATION_COLLECTION)
-                .find(and(eq(Reservation::storeBranch.name, storeBranch), eq(Reservation::gameType.name, gameType)))
+                .find(and(
+                    eq(Reservation::storeBranch.name, storeBranch),
+                    eq(Reservation::gameType.name, gameType),
+                    gte(Reservation::session.name, 0)
+                ))
                 .sort(org.bson.Document("createdAt", -1))
                 .firstOrNull()
         }
