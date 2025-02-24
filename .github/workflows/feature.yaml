@@ -12,9 +12,4 @@ permissions:
 jobs:
   test:
     name: Test
-    runs-on: lomeone-arc-runner-set
-
-    steps:
-      - name: Test
-        uses: lomeone/github-action/.github/workflows/gradle-test.yaml@main
-
+    uses: lomeone/github-action/.github/workflows/gradle-test.yaml@main
