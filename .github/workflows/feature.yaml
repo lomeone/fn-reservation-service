@@ -10,16 +10,10 @@ permissions:
   packages: write
 
 jobs:
-  check:
-    name: Check env
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check env
-        run: |
-          echo $GITHUB_TOKEN
-          echo $GITHUB_ACTOR
-
   test:
     name: Test Feature
     uses: lomeone/github-action/.github/workflows/gradle-test.yaml@main
     secrets: inherit
+    env:
+      GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
