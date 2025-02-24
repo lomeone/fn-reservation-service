@@ -10,6 +10,17 @@ permissions:
   packages: write
 
 jobs:
+  check:
+    name: Check
+    runs-on: lomeone-arc-runner-set
+    steps:
+      - name: Check secretes
+        run: |
+          echo ${{ secrets.AWS_ROLE_ARN }}
+          echo ${{ secrets.AWS_REGION }}
+          echo ${{ secrets.CODECOV_TOKEN }}
+          echo ${{ secrets.COVERALLS_REPO_TOKEN }}
+
   test:
     name: Test
     uses: lomeone/github-action/.github/workflows/gradle-test.yaml@main
