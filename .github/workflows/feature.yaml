@@ -10,6 +10,13 @@ permissions:
   packages: write
 
 jobs:
+  check:
+    name: Check env
+    runs-on: ubuntu-latest
+    run: |
+      echo $GITHUB_TOKEN
+      echo $GITHUB_ACTOR
+
   test:
     name: Test Feature
     uses: lomeone/github-action/.github/workflows/gradle-test.yaml@main
