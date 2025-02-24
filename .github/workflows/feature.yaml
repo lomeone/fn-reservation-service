@@ -13,3 +13,6 @@ jobs:
   test:
     name: Test Feature
     uses: lomeone/github-action/.github/workflows/gradle-test.yaml@feature/test
+    with:
+      aws-role-arn: ${{ secrets.AWS_ROLE_ARN }}
+      aws-region: ${{ secrets.AWS_REGION }}
