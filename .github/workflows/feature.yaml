@@ -12,5 +12,5 @@ permissions:
 jobs:
   test:
     name: Test Feature
-    uses: lomeone/github-action/.github/workflows/gradle-test.yaml@feature/test
+    uses: lomeone/github-action/.github/workflows/gradle-test.yaml@main
     secrets: inherit
