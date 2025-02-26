@@ -1,4 +1,4 @@
-name: Dev Deploy
+name: Deploy dev
 
 on:
   push:
@@ -9,6 +9,7 @@ on:
 permissions:
   id-token: write   # This is required for requesting the JWT
   contents: read    # This is required for actions/checkout
+  packages: read    # This is required for installing dependencies
 
 jobs:
   test:
@@ -25,10 +26,10 @@ jobs:
     secrets: inherit
 
   deploy:
-    name: Deploy preview
+    name: Deploy dev
     runs-on: ubuntu-latest
-    needs: build
-    environment: preview
+    needs: [build]
+    environment: dev
 
     steps:
       - name: Checkout my code
