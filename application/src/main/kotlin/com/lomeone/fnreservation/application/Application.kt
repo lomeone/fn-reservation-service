@@ -40,6 +40,7 @@ fun Application.injectConfigure() {
             }
         }, org.koin.dsl.module {
             single<ReservationRepository> { ReservationRepositoryImpl(get()) }
+            single<StaffRepository> { StaffRepositoryImpl(get()) }
         }, org.koin.dsl.module {
             single {
                 StartReservationService(get())
@@ -56,6 +57,10 @@ fun Application.injectConfigure() {
             single {
                 CancelReservationService(get())
             }
+        }, org.koin.dsl.module {
+            single {
+                RegisterStaffService(get())
+            }
         })
     }
 }
@@ -67,4 +72,5 @@ fun Application.module() {
     configureStatus()
     injectConfigure()
     routeReservation()
+    routeStaff()
 }
