@@ -3,6 +3,7 @@ package com.lomeone.fnreservation.infrastructure.management.repository
 import com.lomeone.fnreservation.domain.management.entity.Staff
 import com.lomeone.fnreservation.domain.management.repository.StaffRepository
 import com.mongodb.MongoException
+import com.mongodb.client.model.Filters.and
 import com.mongodb.client.model.Filters.eq
 import com.mongodb.client.model.UpdateOptions
 import com.mongodb.client.model.Updates
@@ -67,7 +68,12 @@ class StaffRepositoryImpl(
         }
     }
 
-    override fun findByStoreBranchAndName(storeBranch: String, name: String): Staff? {
-        TODO("Not yet implemented")
-    }
+    override fun findByStoreBranchAndName(storeBranch: String, name: String): Staff? =
+        runBlocking {
+            mongoDatabase.getCollection<Staff>(STAFF_COLLECTION)
+                .find(and(
+                    eq(Staff::storeBranch.name, storeBranch),
+                    eq((Staff::name.name), name)
+                )).firstOrNull()
+        }
 }
