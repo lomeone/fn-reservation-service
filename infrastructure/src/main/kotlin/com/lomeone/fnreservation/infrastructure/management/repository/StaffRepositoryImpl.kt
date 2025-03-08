@@ -9,6 +9,7 @@ import com.mongodb.client.model.UpdateOptions
 import com.mongodb.client.model.Updates
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.bson.conversions.Bson
 import kotlin.reflect.full.memberProperties
@@ -67,6 +68,13 @@ class StaffRepositoryImpl(
                 .firstOrNull() ?: throw Exception()
         }
     }
+
+    override fun findByStoreBranch(storeBranch: String): List<Staff> =
+        runBlocking {
+            mongoDatabase.getCollection<Staff>(STAFF_COLLECTION)
+                .find(eq(Staff::storeBranch.name, storeBranch))
+                .toList()
+        }
 
     override fun findByStoreBranchAndName(storeBranch: String, name: String): Staff? =
         runBlocking {
