@@ -7,6 +7,7 @@ import com.lomeone.fnreservation.application.plugins.configureRouting
 import com.lomeone.fnreservation.application.plugins.configureSerialization
 import com.lomeone.fnreservation.application.plugins.configureStatus
 import com.lomeone.fnreservation.domain.management.repository.StaffRepository
+import com.lomeone.fnreservation.domain.management.service.GetStaffsService
 import com.lomeone.fnreservation.domain.management.service.RegisterStaffService
 import com.lomeone.fnreservation.domain.reservation.repository.ReservationRepository
 import com.lomeone.fnreservation.domain.reservation.service.*
@@ -60,6 +61,9 @@ fun Application.injectConfigure() {
         }, org.koin.dsl.module {
             single {
                 RegisterStaffService(get())
+            }
+            single {
+                GetStaffsService(get())
             }
         })
     }
