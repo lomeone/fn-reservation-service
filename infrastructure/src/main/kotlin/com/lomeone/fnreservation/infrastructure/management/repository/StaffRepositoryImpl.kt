@@ -1,6 +1,7 @@
 package com.lomeone.fnreservation.infrastructure.management.repository
 
 import com.lomeone.fnreservation.domain.management.entity.Staff
+import com.lomeone.fnreservation.domain.management.entity.StaffStatus
 import com.lomeone.fnreservation.domain.management.repository.StaffRepository
 import com.mongodb.MongoException
 import com.mongodb.client.model.Filters.and
@@ -69,10 +70,13 @@ class StaffRepositoryImpl(
         }
     }
 
-    override fun findByStoreBranch(storeBranch: String): List<Staff> =
+    override fun findByStoreBranchAndStatus(storeBranch: String, status: StaffStatus): List<Staff> =
         runBlocking {
             mongoDatabase.getCollection<Staff>(STAFF_COLLECTION)
-                .find(eq(Staff::storeBranch.name, storeBranch))
+                .find(and(
+                    eq(Staff::storeBranch.name, storeBranch),
+                    eq(Staff::status.name, status)
+                ))
                 .toList()
         }
 
