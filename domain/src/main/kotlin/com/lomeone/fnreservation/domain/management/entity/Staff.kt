@@ -14,7 +14,7 @@ data class Staff(
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime = LocalDateTime.now()
 ) {
-    fun inactivate() {
+    fun deactivate() {
         this.status = StaffStatus.INACTIVE
     }
 
