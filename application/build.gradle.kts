@@ -47,8 +47,15 @@ tasks.named("processResources") {
 }
 
 jib {
+    container {
+        jvmFlags = listOf(
+            "-XX:+UseContainerSupport",     // 컨테이너 환경 인식
+            "-XX:MaxRAMPercentage=75.0",    // 힙 메모리 자동 조정
+            "-XX:+UseG1GC"                  // G1 GC 사용 (컨테이너에 적합)
+        )
+    }
     from {
-        image = "amazoncorretto:21"
+        image = "amazoncorretto:21-alpine3.21"
         platforms {
             platform {
                 architecture = "amd64"

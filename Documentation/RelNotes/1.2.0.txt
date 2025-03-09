@@ -1,0 +1,6 @@
+fn-reservation-service v1.2.0 Release Notes
+===========================================
+
+* New Feature
+1. Implement staff management
+1.1. Implement staff CRUD
