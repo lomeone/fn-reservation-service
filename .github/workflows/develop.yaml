@@ -18,6 +18,7 @@ jobs:
     secrets: inherit
 
   build:
+    environment: dev
     name: JIB Build
     needs: [test]
     uses: lomeone/github-action/.github/workflows/gradle-module-jib.yaml@main
