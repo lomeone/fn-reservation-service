@@ -16,3 +16,4 @@ jobs:
     with:
       module-name: application
     secrets: inherit
+    environment: staging
