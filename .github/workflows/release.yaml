@@ -14,5 +14,5 @@ jobs:
     name: JIB Build
     uses: lomeone/github-action/.github/workflows/gradle-module-jib.yaml@main
     with:
-      module-name: 'application'
+      module-name: application
     secrets: inherit
