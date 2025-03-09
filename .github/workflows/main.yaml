@@ -16,3 +16,12 @@ jobs:
     with:
       module-name: application
     secrets: inherit
+
+  deploy:
+    environment: production
+    name: Deploy develop
+    needs: [build]
+    runs-on: lomeone-arc-runner-set
+    steps:
+      - name: Finish deploy
+        run: echo "Deployed to production"
