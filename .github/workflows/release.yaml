@@ -1,10 +1,8 @@
-name: Deploy dev
+name: Deploy staging
 
 on:
   push:
-    branches: [ develop, bugfix/** ]
-  pull_request:
-    branches: [ develop ]
+    branches: [ release/** ]
 
 permissions:
   id-token: write   # This is required for requesting the JWT
@@ -12,15 +10,9 @@ permissions:
   packages: read    # This is required for installing dependencies
 
 jobs:
-  test:
-    name: Test develop
-    uses: lomeone/github-action/.github/workflows/gradle-test.yaml@main
-    secrets: inherit
-
   build:
-    environment: dev
+    environment: staging
     name: JIB Build
-    needs: [test]
     uses: lomeone/github-action/.github/workflows/gradle-module-jib.yaml@main
     with:
       module-name: application

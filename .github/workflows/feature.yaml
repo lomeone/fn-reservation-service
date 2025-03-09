@@ -7,10 +7,10 @@ on:
 permissions:
   id-token: write   # This is required for requesting the JWT
   contents: read    # This is required for actions/checkout
-  packages: write
+  packages: read    # This is required for installing dependencies
 
 jobs:
   test:
-    name: Test Feature
+    name: Test feature
     uses: lomeone/github-action/.github/workflows/gradle-test.yaml@main
     secrets: inherit
