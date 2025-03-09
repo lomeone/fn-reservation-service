@@ -19,7 +19,7 @@ jobs:
 
   deploy:
     environment: production
-    name: Deploy develop
+    name: Deploy production
     needs: [build]
     runs-on: lomeone-arc-runner-set
     steps:

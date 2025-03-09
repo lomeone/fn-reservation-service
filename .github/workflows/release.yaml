@@ -19,7 +19,7 @@ jobs:
 
   deploy:
     environment: staging
-    name: Deploy develop
+    name: Deploy staging
     needs: [build]
     runs-on: lomeone-arc-runner-set
     steps:
