@@ -18,10 +18,18 @@ jobs:
     secrets: inherit
 
   build:
-    environment: dev
     name: JIB Build
     needs: [test]
     uses: lomeone/github-action/.github/workflows/gradle-module-jib.yaml@main
     with:
       module-name: application
     secrets: inherit
+
+  deploy:
+    environment: dev
+    name: Deploy develop
+    needs: [build]
+    runs-on: lomeone-arc-runner-set
+    steps:
+      - name: Finish deploy
+        run: echo "Deployed to dev"

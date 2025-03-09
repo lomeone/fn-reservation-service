@@ -11,9 +11,17 @@ permissions:
 
 jobs:
   build:
-    environment: staging
     name: JIB Build
     uses: lomeone/github-action/.github/workflows/gradle-module-jib.yaml@main
     with:
       module-name: application
     secrets: inherit
+
+  deploy:
+    environment: staging
+    name: Deploy staging
+    needs: [build]
+    runs-on: lomeone-arc-runner-set
+    steps:
+      - name: Finish deploy
+        run: echo "Deployed to staging"
