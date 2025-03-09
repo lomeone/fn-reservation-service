@@ -10,10 +10,7 @@ permissions:
   packages: read    # This is required for installing dependencies
 
 jobs:
-  build:
-    environment: staging
-    name: JIB Build
-    uses: lomeone/github-action/.github/workflows/gradle-module-jib.yaml@main
-    with:
-      module-name: 'application'
+  test:
+    name: Test develop
+    uses: lomeone/github-action/.github/workflows/gradle-test.yaml@main
     secrets: inherit
