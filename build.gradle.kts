@@ -7,6 +7,9 @@ val eunoia_exception_version: String by project
 
 plugins {
     kotlin("jvm")
+    kotlin("plugin.spring")
+    id("org.springframework.boot")
+    id("io.spring.dependency-management")
     id("org.jetbrains.kotlin.plugin.serialization")
 }
 
@@ -16,6 +19,9 @@ allprojects {
 
     apply {
         plugin("kotlin")
+        plugin("kotlin-spring")
+        plugin("org.springframework.boot")
+        plugin("io.spring.dependency-management")
         plugin("org.jetbrains.kotlin.plugin.serialization")
     }
 
@@ -46,6 +52,8 @@ subprojects {
     }
 
     dependencies {
+        implementation("org.springframework.boot:spring-boot-starter-validation")
+
         // MongoDB
         implementation("org.mongodb:mongodb-driver-kotlin-coroutine:4.10.1")
 
@@ -54,6 +62,7 @@ subprojects {
         implementation("com.lomeone.eunoia:exception:$eunoia_exception_version")
 
         testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
+        testImplementation("org.springframework.boot:spring-boot-starter-test")
     }
 
     tasks.test {
