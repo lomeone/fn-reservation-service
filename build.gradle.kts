@@ -11,6 +11,7 @@ plugins {
     id("org.springframework.boot")
     id("io.spring.dependency-management")
     id("org.jetbrains.kotlin.plugin.serialization")
+    id("com.google.cloud.tools.jib")
 }
 
 allprojects {
@@ -23,6 +24,7 @@ allprojects {
         plugin("org.springframework.boot")
         plugin("io.spring.dependency-management")
         plugin("org.jetbrains.kotlin.plugin.serialization")
+        plugin("com.google.cloud.tools.jib")
     }
 
     repositories {
