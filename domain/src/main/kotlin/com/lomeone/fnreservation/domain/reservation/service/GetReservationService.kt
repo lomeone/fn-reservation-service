@@ -3,7 +3,9 @@ package com.lomeone.fnreservation.domain.reservation.service
 import com.lomeone.fnreservation.domain.reservation.entity.ReservationStatus
 import com.lomeone.fnreservation.domain.reservation.exception.ReservationNotFoundException
 import com.lomeone.fnreservation.domain.reservation.repository.ReservationRepository
+import org.springframework.stereotype.Service
 
+@Service
 class GetReservationService(
     private val reservationRepository: ReservationRepository
 ) {

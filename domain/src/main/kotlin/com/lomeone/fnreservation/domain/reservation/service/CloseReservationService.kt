@@ -4,7 +4,9 @@ import com.lomeone.fnreservation.domain.reservation.entity.Reservation
 import com.lomeone.fnreservation.domain.reservation.exception.ReservationClosedException
 import com.lomeone.fnreservation.domain.reservation.exception.ReservationNotFoundException
 import com.lomeone.fnreservation.domain.reservation.repository.ReservationRepository
+import org.springframework.stereotype.Service
 
+@Service
 class CloseReservationService(
     private val reservationRepository: ReservationRepository
 ) {

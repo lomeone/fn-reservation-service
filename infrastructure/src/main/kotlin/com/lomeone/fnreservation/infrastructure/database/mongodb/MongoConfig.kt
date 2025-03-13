@@ -4,8 +4,13 @@ import aws.sdk.kotlin.services.secretsmanager.model.GetSecretValueRequest
 import com.lomeone.fnreservation.infrastructure.aws.secretsmanager.SecretsManagerConfig
 import com.mongodb.kotlin.client.coroutine.MongoClient
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
+import jakarta.annotation.PreDestroy
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 
-object MongoConfig {
+@Configuration
+class MongoConfig {
     private val mongoClient: MongoClient by lazy {
         val uri = getMongodbUri()
         MongoClient.create(uri)
@@ -22,8 +27,10 @@ object MongoConfig {
         return response.secretString ?: throw Exception()
     }
 
-    fun getMongoDatabase(database: String): MongoDatabase = mongoClient.getDatabase(database)
+    @Bean
+    fun getMongoDatabase(@Value("\${mongodb.database}") database: String): MongoDatabase = mongoClient.getDatabase(database)
 
+    @PreDestroy
     fun close() {
         mongoClient.close()
     }
