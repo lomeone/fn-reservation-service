@@ -19,5 +19,11 @@ jobs:
     name: Deploy develop
     runs-on: lomeone-arc-runner-set
     steps:
+      - name: Configure AWS Credential
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
       - name: Image pull in ecr cache
         run: docker pull 396428372646.dkr.ecr.ap-northeast-2.amazonaws.com/docker-hub/comstering/fn-reservation-service:main
