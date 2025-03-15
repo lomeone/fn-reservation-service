@@ -14,3 +14,11 @@ jobs:
     name: Test feature
     uses: lomeone/github-action/.github/workflows/gradle-test.yaml@main
     secrets: inherit
+
+  deploy:
+    name: Deploy develop
+    needs: [test]
+    runs-on: lomeone-arc-runner-set
+    steps:
+      - name: Image pull in ecr cache
+        run: docker pull 396428372646.dkr.ecr.ap-northeast-2.amazonaws.com/docker-hub/comstering/fn-reservation-service:main
