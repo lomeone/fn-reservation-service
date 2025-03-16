@@ -11,10 +11,12 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import org.bson.conversions.Bson
 import org.slf4j.LoggerFactory
+import org.springframework.stereotype.Component
 import kotlin.reflect.full.memberProperties
 
 private const val RESERVATION_COLLECTION = "reservation"
 
+@Component
 class ReservationRepositoryImpl(
     private val mongoDatabase: MongoDatabase
 ) : ReservationRepository {

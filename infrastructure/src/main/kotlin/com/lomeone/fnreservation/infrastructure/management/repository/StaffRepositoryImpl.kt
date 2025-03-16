@@ -13,10 +13,12 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.bson.conversions.Bson
+import org.springframework.stereotype.Component
 import kotlin.reflect.full.memberProperties
 
 private const val STAFF_COLLECTION = "staff"
 
+@Component
 class StaffRepositoryImpl(
     private val mongoDatabase: MongoDatabase
 ) : StaffRepository {

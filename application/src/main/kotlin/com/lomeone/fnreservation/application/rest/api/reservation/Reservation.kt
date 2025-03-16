@@ -1,12 +1,5 @@
 package com.lomeone.fnreservation.application.rest.api.reservation
 
-import io.ktor.resources.*
-import kotlinx.serialization.Serializable
-
-@Resource("/reservation")
-class Reservation
-
-@Serializable
 data class ReservationRequest(
     val storeBranch: String,
     val gameType: String,
@@ -14,7 +7,6 @@ data class ReservationRequest(
     val reservationTime: String
 )
 
-@Serializable
 data class ReservationResponse(
     val gameType: String,
     val session: Int,

@@ -1,0 +1,4 @@
+server:
+  shutdown: graceful
+mongodb:
+  database: fn_reservation
