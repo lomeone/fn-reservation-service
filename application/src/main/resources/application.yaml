@@ -1,4 +1,20 @@
 server:
   shutdown: graceful
+
 mongodb:
   database: fn_reservation
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,metrics,prometheus"
+
+  tracing:
+    enabled: true
+
+micrometer:
+  tracing:
+    bridge:
+      brave:
+        enabled: true

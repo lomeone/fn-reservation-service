@@ -1,6 +1,7 @@
 import java.io.ByteArrayOutputStream
 
-val koin_version: String by project
+val prometheusVersion: String by project
+val micrometerTracingVersion: String by project
 
 val image_registry: String by project
 val service_name: String by project
@@ -19,6 +20,12 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-undertow") {
         exclude(module = "undertow-websockets-jsr")
     }
+
+    // Observability
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("io.micrometer:micrometer-registry-prometheus:${prometheusVersion}")
+    implementation("io.micrometer:micrometer-tracing:${micrometerTracingVersion}")
+    implementation("io.micrometer:micrometer-tracing-bridge-brave:${micrometerTracingVersion}")
 }
 
 jib {
