@@ -2,6 +2,8 @@ import java.io.ByteArrayOutputStream
 
 val group_name: String by project
 
+val mongodbDriverVersion: String by project
+
 val logback_version: String by project
 val eunoia_exception_version: String by project
 
@@ -57,7 +59,7 @@ subprojects {
         implementation("org.springframework.boot:spring-boot-starter-validation")
 
         // MongoDB
-        implementation("org.mongodb:mongodb-driver-kotlin-coroutine:4.10.1")
+        implementation("org.mongodb:mongodb-driver-kotlin-coroutine:$mongodbDriverVersion")
 
         implementation("ch.qos.logback:logback-classic:$logback_version")
 

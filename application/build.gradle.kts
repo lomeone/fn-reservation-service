@@ -1,8 +1,6 @@
 import java.io.ByteArrayOutputStream
 
 val koin_version: String by project
-val prometheus_version: String by project
-val swagger_version: String by project
 
 val image_registry: String by project
 val service_name: String by project
