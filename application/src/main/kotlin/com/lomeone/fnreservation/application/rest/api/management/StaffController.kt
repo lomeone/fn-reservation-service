@@ -3,9 +3,11 @@ package com.lomeone.fnreservation.application.rest.api.management
 import com.lomeone.fnreservation.domain.management.service.*
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-@RestController("/staff")
+@RestController
+@RequestMapping("/staff")
 class StaffController(
     private val registerStaffService: RegisterStaffService,
     private val getStaffsService: GetStaffsService,

@@ -2,6 +2,7 @@ package com.lomeone.fnreservation.infrastructure.reservation.repository
 
 import com.lomeone.fnreservation.domain.reservation.entity.Reservation
 import com.lomeone.fnreservation.domain.reservation.repository.ReservationRepository
+import com.lomeone.fnreservation.infrastructure.database.mongodb.MongoConfig
 import com.mongodb.MongoException
 import com.mongodb.client.model.Filters.*
 import com.mongodb.client.model.UpdateOptions
@@ -11,15 +12,20 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import org.bson.conversions.Bson
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import kotlin.reflect.full.memberProperties
 
 private const val RESERVATION_COLLECTION = "reservation"
 
 @Component
-class ReservationRepositoryImpl(
-    private val mongoDatabase: MongoDatabase
-) : ReservationRepository {
+class ReservationRepositoryImpl : ReservationRepository {
+    @Value("\${mongodb.database}")
+    lateinit var databaseName: String
+
+    private val mongoDatabase: MongoDatabase by lazy {
+        MongoConfig.getMongoDatabase(databaseName)
+    }
 
     private val log = LoggerFactory.getLogger(this.javaClass)
 

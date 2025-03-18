@@ -3,6 +3,7 @@ package com.lomeone.fnreservation.infrastructure.management.repository
 import com.lomeone.fnreservation.domain.management.entity.Staff
 import com.lomeone.fnreservation.domain.management.entity.StaffStatus
 import com.lomeone.fnreservation.domain.management.repository.StaffRepository
+import com.lomeone.fnreservation.infrastructure.database.mongodb.MongoConfig
 import com.mongodb.MongoException
 import com.mongodb.client.model.Filters.and
 import com.mongodb.client.model.Filters.eq
@@ -13,15 +14,21 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.bson.conversions.Bson
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import kotlin.reflect.full.memberProperties
 
 private const val STAFF_COLLECTION = "staff"
 
 @Component
-class StaffRepositoryImpl(
-    private val mongoDatabase: MongoDatabase
-) : StaffRepository {
+class StaffRepositoryImpl : StaffRepository {
+    @Value("\${mongodb.database}")
+    lateinit var databaseName: String
+
+    private val mongoDatabase: MongoDatabase by lazy {
+        MongoConfig.getMongoDatabase(databaseName)
+    }
+
     override fun save(staff: Staff): Staff {
         try {
             return if (isAlreadyExistStaff(staff)) {
