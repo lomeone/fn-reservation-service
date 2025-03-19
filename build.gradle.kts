@@ -5,7 +5,7 @@ val group_name: String by project
 val mongodbDriverVersion: String by project
 
 val logback_version: String by project
-val eunoia_exception_version: String by project
+val eunoiaExceptionVersion: String by project
 
 plugins {
     kotlin("jvm")
@@ -34,8 +34,8 @@ allprojects {
         maven {
             url = uri("https://maven.pkg.github.com/lomeone/eunoia")
             credentials {
-                username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_ACTOR")
-                password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
             }
         }
     }
@@ -63,7 +63,7 @@ subprojects {
 
         implementation("ch.qos.logback:logback-classic:$logback_version")
 
-        implementation("com.lomeone.eunoia:exception:$eunoia_exception_version")
+        implementation("com.lomeone.eunoia:exception:$eunoiaExceptionVersion")
 
         testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
         testImplementation("org.springframework.boot:spring-boot-starter-test")
