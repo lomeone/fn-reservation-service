@@ -2,6 +2,7 @@ import java.io.ByteArrayOutputStream
 
 val prometheusVersion: String by project
 val micrometerTracingVersion: String by project
+val eunoiaSpringWebRestVersion: String by project
 
 val image_registry: String by project
 val service_name: String by project
@@ -26,6 +27,8 @@ dependencies {
     implementation("io.micrometer:micrometer-registry-prometheus:${prometheusVersion}")
     implementation("io.micrometer:micrometer-tracing:${micrometerTracingVersion}")
     implementation("io.micrometer:micrometer-tracing-bridge-brave:${micrometerTracingVersion}")
+
+    implementation("com.lomeone.eunoia:spring-web-rest:$eunoiaSpringWebRestVersion")
 }
 
 jib {
