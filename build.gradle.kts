@@ -58,6 +58,9 @@ subprojects {
     dependencies {
         implementation("org.springframework.boot:spring-boot-starter-validation")
 
+        implementation("software.amazon.awssdk:dynamodb:2.31.1")
+        implementation("software.amazon.awssdk:dynamodb-enhanced:2.31.1")
+
         // MongoDB
         implementation("org.mongodb:mongodb-driver-kotlin-coroutine:$mongodbDriverVersion")
 
