@@ -1,6 +1,11 @@
 server:
   shutdown: graceful
 
+database:
+  dynamo:
+    region: ap-northeast-2
+    host: https://dynamodb.ap-northeast-2.amazonaws.com
+
 mongodb:
   database: fn_reservation
 
