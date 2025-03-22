@@ -23,3 +23,6 @@ micrometer:
     bridge:
       brave:
         enabled: true
+logging:
+  level:
+    root: info
