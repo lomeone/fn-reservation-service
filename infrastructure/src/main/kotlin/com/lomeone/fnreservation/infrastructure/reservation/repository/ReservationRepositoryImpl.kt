@@ -4,7 +4,7 @@ import com.lomeone.fnreservation.domain.reservation.entity.Reservation
 import com.lomeone.fnreservation.domain.reservation.entity.ReservationStatus
 import com.lomeone.fnreservation.domain.reservation.repository.ReservationRepository
 import com.lomeone.fnreservation.infrastructure.reservation.exception.DynamoReservationPutItemNotFoundException
-import org.springframework.stereotype.Service
+import org.springframework.stereotype.Repository
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient
 import software.amazon.awssdk.enhanced.dynamodb.Expression
 import software.amazon.awssdk.enhanced.dynamodb.Key
@@ -15,7 +15,7 @@ import software.amazon.awssdk.enhanced.dynamodb.model.ScanEnhancedRequest
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue
 import java.time.ZonedDateTime
 
-@Service
+@Repository
 class ReservationRepositoryImpl(
     dynamoDbEnhancedClient: DynamoDbEnhancedClient
 ) : ReservationRepository {
@@ -24,7 +24,7 @@ class ReservationRepositoryImpl(
 
     override fun save(reservation: Reservation): Reservation {
         val existingReservation = findById(reservation.id)
-        return if (existingReservation != null) {
+        return if (isAlreadyExistReservation(reservation)) {
             table.updateItem(ReservationDynamo(reservation = reservation)).toReservation()
         } else {
             table.putItem(ReservationDynamo(reservation = reservation))
@@ -39,11 +39,10 @@ class ReservationRepositoryImpl(
         }
     }
 
-    override fun findById(id: String): Reservation? {
-        val key = Key.builder().partitionValue(id).build()
-        val item = table.getItem(key)
-        return item?.toReservation()
-    }
+    private fun isAlreadyExistReservation(reservation: Reservation) = findById(reservation.id) != null
+
+    override fun findById(id: String): Reservation? =
+        table.getItem(Key.builder().partitionValue(id).build())?.toReservation()
 
     override fun findByStoreBranchAndLatestGameType(storeBranch: String, gameType: String): Reservation? {
         val items = table.scan(
@@ -54,8 +53,7 @@ class ReservationRepositoryImpl(
                         .putExpressionValue(":storeBranch", AttributeValue.builder().s(storeBranch).build())
                         .putExpressionValue(":gameType", AttributeValue.builder().s(gameType).build())
                         .build()
-                )
-                .build()
+                ).build()
         ).items()
         val reservations = items.sortedBy { it.session }
 
@@ -112,8 +110,8 @@ class ReservationDynamo(
         updatedAt = ZonedDateTime.now()
     )
 
-    fun toReservation(): Reservation {
-        return Reservation(
+    fun toReservation(): Reservation =
+        Reservation(
             id = this.reservations_id,
             storeBranch = this.storeBranch,
             gameType = this.gameType,
@@ -123,5 +121,4 @@ class ReservationDynamo(
             createdAt = this.createdAt,
             updatedAt = this.updatedAt
         )
-    }
 }
