@@ -3,6 +3,7 @@ package com.lomeone.fnreservation.application.rest.api.management
 import com.lomeone.fnreservation.domain.management.service.*
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -14,7 +15,7 @@ class StaffController(
     private val deactivateStaffService: DeactivateStaffService
 ) {
     @PostMapping
-    fun registerStaff(request: RegisterStaffRequest): RegisterStaffResponse {
+    fun registerStaff(@RequestBody request: RegisterStaffRequest): RegisterStaffResponse {
         val result = registerStaffService.registerStaff(RegisterStaffCommand(request.storeBranch, request.name))
 
         return RegisterStaffResponse(
@@ -35,7 +36,7 @@ class StaffController(
     }
 
     @PostMapping("/deactivate")
-    fun deactivateStaff(request: DeactivateStaffRequest): DeactivateStaffResponse {
+    fun deactivateStaff(@RequestBody request: DeactivateStaffRequest): DeactivateStaffResponse {
         val result = deactivateStaffService.deactivateStaff(DeactivateStaffCommand(request.storeBranch, request.name))
 
         return DeactivateStaffResponse(
