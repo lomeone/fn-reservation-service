@@ -1,19 +1,22 @@
 package com.lomeone.fnreservation.domain.management.entity
 
-import org.bson.codecs.pojo.annotations.BsonId
-import org.bson.types.ObjectId
-import java.time.LocalDateTime
+import java.security.MessageDigest
+import java.time.ZonedDateTime
 
-data class Staff(
-    @BsonId
-    val id: ObjectId = ObjectId(),
+class Staff(
+    id: String? = null,
     val storeBranch: String,
     val name: String,
     var role: StaffRole = StaffRole.STAFF,
     var status: StaffStatus = StaffStatus.ACTIVE,
-    val createdAt: LocalDateTime = LocalDateTime.now(),
-    val updatedAt: LocalDateTime = LocalDateTime.now()
+    val createdAt: ZonedDateTime = ZonedDateTime.now(),
+    val updatedAt: ZonedDateTime = ZonedDateTime.now()
 ) {
+
+    val id: String = id ?: MessageDigest.getInstance("SHA-256")
+        .digest("${storeBranch}_${name}".toByteArray())
+        .joinToString("") { "%02x".format(it) }
+
     fun deactivate() {
         this.status = StaffStatus.INACTIVE
     }

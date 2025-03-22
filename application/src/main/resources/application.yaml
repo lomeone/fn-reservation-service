@@ -6,9 +6,6 @@ database:
     region: ap-northeast-2
     host: https://dynamodb.ap-northeast-2.amazonaws.com
 
-mongodb:
-  database: fn_reservation
-
 management:
   endpoints:
     web:
@@ -22,7 +19,8 @@ micrometer:
   tracing:
     bridge:
       brave:
-        enabled: true
+        enabled: trueg
+
 logging:
   level:
     root: info
