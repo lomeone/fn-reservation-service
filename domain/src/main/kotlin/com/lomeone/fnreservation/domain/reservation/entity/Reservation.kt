@@ -1,27 +1,26 @@
 package com.lomeone.fnreservation.domain.reservation.entity
 
 import org.bson.codecs.pojo.annotations.BsonProperty
-import org.bson.types.ObjectId
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey
-import java.time.LocalDateTime
+import java.security.MessageDigest
+import java.time.ZonedDateTime
 
-@DynamoDbBean
 class Reservation(
-    @get:DynamoDbPartitionKey
-    val id: ObjectId = ObjectId(),
+    id: String? = null,
     val storeBranch: String,
     val gameType: String,
     val session: Int,
     @BsonProperty("reservation")
     reservation: LinkedHashMap<String, String> = linkedMapOf(),
-    var status: ReservationStatus = ReservationStatus.OPEN
+    var status: ReservationStatus = ReservationStatus.OPEN,
+    val createdAt: ZonedDateTime = ZonedDateTime.now(),
+    val updatedAt: ZonedDateTime = ZonedDateTime.now()
 ) {
+    val id: String = id ?: MessageDigest.getInstance("SHA-256")
+        .digest("${storeBranch}_${gameType}_${session}".toByteArray())
+        .joinToString("") { "%02x".format(it) }
+
     private val _reservation: LinkedHashMap<String, String> = reservation
     val reservation: Map<String, String> get() = this._reservation.toMap()
-
-    var createdAt: LocalDateTime = LocalDateTime.now()
-    var updatedAt: LocalDateTime = LocalDateTime.now()
 
     fun reserve(name: String, time: String) {
         this._reservation.put(name, time)
