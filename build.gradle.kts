@@ -14,6 +14,7 @@ plugins {
     id("io.spring.dependency-management")
     id("org.jetbrains.kotlin.plugin.serialization")
     id("com.google.cloud.tools.jib")
+    id("org.jetbrains.kotlinx.kover")
 }
 
 allprojects {
@@ -27,6 +28,7 @@ allprojects {
         plugin("io.spring.dependency-management")
         plugin("org.jetbrains.kotlin.plugin.serialization")
         plugin("com.google.cloud.tools.jib")
+        plugin("org.jetbrains.kotlinx.kover")
     }
 
     repositories {
@@ -38,6 +40,11 @@ allprojects {
                 password = System.getenv("GITHUB_TOKEN")
             }
         }
+    }
+
+    tasks.test {
+        useJUnitPlatform()
+        finalizedBy(tasks.koverVerify, tasks.koverHtmlReport, tasks.koverXmlReport)
     }
 }
 
@@ -65,11 +72,14 @@ subprojects {
         testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
         testImplementation("org.springframework.boot:spring-boot-starter-test")
     }
-
-    tasks.test {
-        useJUnitPlatform()
-    }
 }
+
+dependencies {
+    kover(project(":application"))
+    kover(project(":domain"))
+    kover(project(":infrastructure"))
+}
+
 
 fun getGitHash(): String {
     val stdout = ByteArrayOutputStream()

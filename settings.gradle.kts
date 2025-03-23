@@ -6,6 +6,7 @@ pluginManagement {
     val springBootVersion: String by settings
     val springDependencyManagement: String by settings
     val jibVersion: String by settings
+    val koverVersion: String by settings
 
     plugins {
         kotlin("jvm") version kotlin_version
@@ -14,6 +15,7 @@ pluginManagement {
         id("io.spring.dependency-management") version springDependencyManagement
         id("org.jetbrains.kotlin.plugin.serialization") version kotlin_version
         id("com.google.cloud.tools.jib") version jibVersion
+        id("org.jetbrains.kotlinx.kover") version koverVersion
     }
 }
 
