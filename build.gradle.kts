@@ -15,6 +15,8 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization")
     id("com.google.cloud.tools.jib")
     id("org.jetbrains.kotlinx.kover")
+    id("org.sonarqube")
+    id("com.github.kt3k.coveralls")
 }
 
 allprojects {
@@ -80,6 +82,17 @@ dependencies {
     kover(project(":infrastructure"))
 }
 
+sonarqube {
+    properties {
+        property("sonar.coverage.jacoco.xmlReportPaths", "${layout.buildDirectory.file("reports/kover/report.xml")}")
+    }
+}
+
+coveralls {
+    jacocoReportPath = "${projectDir}/build/reports/kover/report.xml"
+    sourceDirs = subprojects.map { it.sourceSets.main.get().allSource.srcDirs.toList() }
+        .toList().flatten().map { relativePath(it) }
+}
 
 fun getGitHash(): String {
     val stdout = ByteArrayOutputStream()
