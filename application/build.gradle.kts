@@ -65,7 +65,7 @@ fun getImageTags(): Set<String> {
     if (branch.isNotBlank()) {
         tags.add(branch)
     }
-    tags.add(getGitHash())
+    tags.add(version.toString())
 
     return tags
 }
@@ -77,13 +77,4 @@ fun getGitCurrentBranch(): String {
         standardOutput = stdout
     }
     return stdout.toString().trim().replace("/","-")
-}
-
-fun getGitHash(): String {
-    val stdout = ByteArrayOutputStream()
-    exec {
-        commandLine = listOf("git", "rev-parse", "--short", "HEAD")
-        standardOutput = stdout
-    }
-    return stdout.toString().trim()
 }
