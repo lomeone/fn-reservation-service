@@ -25,10 +25,7 @@ class ReservationRepositoryImpl(
 
     override fun save(reservation: Reservation): Reservation {
         return if (isAlreadyExistReservation(reservation)) {
-            println("resevation: ${reservation.reservation}")
-            val a = table.updateItem(ReservationDynamo(reservation = reservation)).toReservation()
-            println("save reservation ${a.reservation}")
-            a
+            table.updateItem(ReservationDynamo(reservation = reservation)).toReservation()
         } else {
             table.putItem(ReservationDynamo(reservation = reservation))
             this.findById(reservation.id) ?: throw DynamoReservationPutItemNotFoundException(
