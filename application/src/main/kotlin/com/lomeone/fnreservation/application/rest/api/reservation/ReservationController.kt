@@ -68,7 +68,7 @@ class ReservationController(
             ReserveCommand(
                 storeBranch = request.storeBranch,
                 gameType = request.gameType,
-                reservationUsers = request.reservationUsers,
+                reservationUsers = request.reservationUsers.toSet(),
                 reservationTime = request.reservationTime
             )
         )
