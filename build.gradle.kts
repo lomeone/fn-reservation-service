@@ -23,19 +23,6 @@ allprojects {
     group = group_name
     version = getGitHash()
 
-    java {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
-
-        toolchain {
-            languageVersion = JavaLanguageVersion.of(21)
-        }
-    }
-
-    kotlin {
-        jvmToolchain(21)
-    }
-
     apply {
         plugin("kotlin")
         plugin("kotlin-spring")
@@ -64,6 +51,19 @@ allprojects {
 }
 
 subprojects {
+    java {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
+    }
+
+    kotlin {
+        jvmToolchain(21)
+    }
+
     dependencies {
         implementation("org.springframework.boot:spring-boot-starter-validation")
 
