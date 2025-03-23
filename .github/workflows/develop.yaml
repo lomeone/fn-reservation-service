@@ -43,7 +43,6 @@ jobs:
 
       - name: Check github sha
         run: |
-          git rev-parse --short HEAD
           echo $GITHUB_SHA
 
       - name: Image pull in ecr cache
