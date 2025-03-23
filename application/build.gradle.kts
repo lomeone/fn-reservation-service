@@ -62,14 +62,10 @@ fun getImageTags(): Set<String> {
     val tags = mutableSetOf<String>()
     val branch = getGitCurrentBranch()
 
-    println("branch: $branch")
-
     if (branch.isNotBlank()) {
         tags.add(branch)
     }
     tags.add(getGitHash())
-
-    println("tags: $tags")
 
     return tags
 }
