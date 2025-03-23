@@ -4,6 +4,7 @@ import com.lomeone.fnreservation.domain.reservation.entity.Reservation
 import com.lomeone.fnreservation.domain.reservation.entity.ReservationStatus
 import com.lomeone.fnreservation.domain.reservation.repository.ReservationRepository
 import com.lomeone.fnreservation.infrastructure.reservation.exception.DynamoReservationPutItemNotFoundException
+import com.lomeone.fnreservation.infrastructure.reservation.repository.ReservationDynamo.Entry
 import org.springframework.stereotype.Repository
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient
 import software.amazon.awssdk.enhanced.dynamodb.Expression
@@ -23,9 +24,11 @@ class ReservationRepositoryImpl(
     private val table = dynamoDbEnhancedClient.table("fn-reservations", TableSchema.fromBean(ReservationDynamo::class.java))
 
     override fun save(reservation: Reservation): Reservation {
-        val existingReservation = findById(reservation.id)
         return if (isAlreadyExistReservation(reservation)) {
-            table.updateItem(ReservationDynamo(reservation = reservation)).toReservation()
+            println("resevation: ${reservation.reservation}")
+            val a = table.updateItem(ReservationDynamo(reservation = reservation)).toReservation()
+            println("save reservation ${a.reservation}")
+            a
         } else {
             table.putItem(ReservationDynamo(reservation = reservation))
             this.findById(reservation.id) ?: throw DynamoReservationPutItemNotFoundException(
@@ -85,16 +88,20 @@ class ReservationDynamo(
     var storeBranch: String,
     var gameType: String,
     var session: Int = 0,
-    var reservation: Map<String, String> = mapOf(),
+    var reservation: List<Entry>,
     var status: ReservationStatus,
     var createdAt: ZonedDateTime,
     var updatedAt: ZonedDateTime
 ) {
+    @DynamoDbBean
+    data class Entry(var key: String = "", var value: String = "")
+
     constructor() : this(
         reservations_id = "",
         storeBranch = "",
         gameType = "",
         status = ReservationStatus.OPEN,
+        reservation = listOf(),
         createdAt = ZonedDateTime.now(),
         updatedAt = ZonedDateTime.now()
     )
@@ -104,7 +111,7 @@ class ReservationDynamo(
         storeBranch = reservation.storeBranch,
         gameType = reservation.gameType,
         session = reservation.session,
-        reservation = reservation.reservation,
+        reservation = reservation.reservation.toEntryList(),
         status = reservation.status,
         createdAt = reservation.createdAt,
         updatedAt = ZonedDateTime.now()
@@ -116,9 +123,18 @@ class ReservationDynamo(
             storeBranch = this.storeBranch,
             gameType = this.gameType,
             session = this.session,
-            reservation = LinkedHashMap(this.reservation),
+            reservation = reservation.toMap(),
             status = this.status,
             createdAt = this.createdAt,
             updatedAt = this.updatedAt
         )
 }
+
+
+private fun Map<String, String>.toEntryList(): List<Entry> =
+    this.map { Entry(it.key, it.value) }
+
+private fun List<Entry>.toMap(): LinkedHashMap<String, String> =
+    LinkedHashMap<String, String>().apply {
+        this@toMap.forEach { put(it.key, it.value) }
+    }

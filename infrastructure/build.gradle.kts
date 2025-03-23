@@ -1,8 +1,9 @@
-val awsSecretsmanagerJvmVersion: String by project
+val awsDynamoDbVersion: String by project
 
 dependencies {
     implementation(project(":domain"))
     implementation(kotlin("reflect"))
 
-    implementation("aws.sdk.kotlin:secretsmanager-jvm:$awsSecretsmanagerJvmVersion")
+    implementation("software.amazon.awssdk:dynamodb:$awsDynamoDbVersion")
+    implementation("software.amazon.awssdk:dynamodb-enhanced:$awsDynamoDbVersion")
 }

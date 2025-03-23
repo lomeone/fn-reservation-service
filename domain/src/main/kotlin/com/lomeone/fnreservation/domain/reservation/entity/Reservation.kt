@@ -1,6 +1,5 @@
 package com.lomeone.fnreservation.domain.reservation.entity
 
-import org.bson.codecs.pojo.annotations.BsonProperty
 import java.security.MessageDigest
 import java.time.ZonedDateTime
 
@@ -9,7 +8,6 @@ class Reservation(
     val storeBranch: String,
     val gameType: String,
     val session: Int,
-    @BsonProperty("reservation")
     reservation: LinkedHashMap<String, String> = linkedMapOf(),
     var status: ReservationStatus = ReservationStatus.OPEN,
     val createdAt: ZonedDateTime = ZonedDateTime.now(),
