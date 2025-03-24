@@ -82,9 +82,11 @@ dependencies {
     kover(project(":infrastructure"))
 }
 
-sonarqube {
+sonar {
     properties {
-        property("sonar.coverage.jacoco.xmlReportPaths", "${layout.buildDirectory.file("reports/kover/report.xml")}")
+        property("sonar.projectKey", "lomeone_fn-reservation-service")
+        property("sonar.projectName", "fn-reservation-service")
+        property("sonar.coverage.jacoco.xmlReportPaths", "${projectDir}/build/reports/kover/report.xml")
     }
 }
 
