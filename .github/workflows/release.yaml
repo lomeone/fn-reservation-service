@@ -34,4 +34,4 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Image pull in ecr cache
-        run: docker pull 396428372646.dkr.ecr.ap-northeast-2.amazonaws.com/docker-hub/comstering/fn-reservation-service:${GITHUB_REF_NAME}
+        run: docker pull 396428372646.dkr.ecr.ap-northeast-2.amazonaws.com/docker-hub/comstering/fn-reservation-service:${GITHUB_REF_NAME//\//-}
