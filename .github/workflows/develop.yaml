@@ -31,5 +31,24 @@ jobs:
     needs: [build]
     runs-on: lomeone-arc-runner-set
     steps:
-      - name: Finish deploy
-        run: echo "Deployed to dev"
+      - name: Configure AWS Credential
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_GITHUB_ACTION_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Check github sha
+        run: |
+          echo $GITHUB_SHA
+
+      - name: Image pull in ecr cache (PR)
+        if: github.event_name == 'pull_request'
+        run: docker pull 396428372646.dkr.ecr.ap-northeast-2.amazonaws.com/docker-hub/comstering/fn-reservation-service:${GITHUB_SHA::7}
+
+      - name: Image pull in ecr cache (Push)
+        if: github.event_name == 'push'
+        run: docker pull 396428372646.dkr.ecr.ap-northeast-2.amazonaws.com/docker-hub/comstering/fn-reservation-service:${GITHUB_REF_NAME}

@@ -2,12 +2,21 @@ import java.io.ByteArrayOutputStream
 
 val group_name: String by project
 
+val mongodbDriverVersion: String by project
+
 val logback_version: String by project
-val eunoia_exception_version: String by project
+val eunoiaExceptionVersion: String by project
 
 plugins {
     kotlin("jvm")
+    kotlin("plugin.spring")
+    id("org.springframework.boot")
+    id("io.spring.dependency-management")
     id("org.jetbrains.kotlin.plugin.serialization")
+    id("com.google.cloud.tools.jib")
+    id("org.jetbrains.kotlinx.kover")
+    id("org.sonarqube")
+    id("com.github.kt3k.coveralls")
 }
 
 allprojects {
@@ -16,7 +25,12 @@ allprojects {
 
     apply {
         plugin("kotlin")
+        plugin("kotlin-spring")
+        plugin("org.springframework.boot")
+        plugin("io.spring.dependency-management")
         plugin("org.jetbrains.kotlin.plugin.serialization")
+        plugin("com.google.cloud.tools.jib")
+        plugin("org.jetbrains.kotlinx.kover")
     }
 
     repositories {
@@ -24,10 +38,15 @@ allprojects {
         maven {
             url = uri("https://maven.pkg.github.com/lomeone/eunoia")
             credentials {
-                username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_ACTOR")
-                password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
             }
         }
+    }
+
+    tasks.test {
+        useJUnitPlatform()
+        finalizedBy(tasks.koverVerify, tasks.koverHtmlReport, tasks.koverXmlReport)
     }
 }
 
@@ -46,19 +65,35 @@ subprojects {
     }
 
     dependencies {
-        // MongoDB
-        implementation("org.mongodb:mongodb-driver-kotlin-coroutine:4.10.1")
+        implementation("org.springframework.boot:spring-boot-starter-validation")
 
         implementation("ch.qos.logback:logback-classic:$logback_version")
 
-        implementation("com.lomeone.eunoia:exception:$eunoia_exception_version")
+        implementation("com.lomeone.eunoia:exception:$eunoiaExceptionVersion")
 
         testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
+        testImplementation("org.springframework.boot:spring-boot-starter-test")
     }
+}
 
-    tasks.test {
-        useJUnitPlatform()
+dependencies {
+    kover(project(":application"))
+    kover(project(":domain"))
+    kover(project(":infrastructure"))
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "lomeone_fn-reservation-service")
+        property("sonar.projectName", "fn-reservation-service")
+        property("sonar.coverage.jacoco.xmlReportPaths", "${projectDir}/build/reports/kover/report.xml")
     }
+}
+
+coveralls {
+    jacocoReportPath = "${projectDir}/build/reports/kover/report.xml"
+    sourceDirs = subprojects.map { it.sourceSets.main.get().allSource.srcDirs.toList() }
+        .toList().flatten().map { relativePath(it) }
 }
 
 fun getGitHash(): String {

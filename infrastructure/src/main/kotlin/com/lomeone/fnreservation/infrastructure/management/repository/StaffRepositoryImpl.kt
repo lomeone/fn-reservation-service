@@ -3,89 +3,114 @@ package com.lomeone.fnreservation.infrastructure.management.repository
 import com.lomeone.fnreservation.domain.management.entity.Staff
 import com.lomeone.fnreservation.domain.management.entity.StaffStatus
 import com.lomeone.fnreservation.domain.management.repository.StaffRepository
-import com.mongodb.MongoException
-import com.mongodb.client.model.Filters.and
-import com.mongodb.client.model.Filters.eq
-import com.mongodb.client.model.UpdateOptions
-import com.mongodb.client.model.Updates
-import com.mongodb.kotlin.client.coroutine.MongoDatabase
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.runBlocking
-import org.bson.conversions.Bson
-import kotlin.reflect.full.memberProperties
+import com.lomeone.fnreservation.infrastructure.management.exception.DynamoStaffPutItemNotFoundException
+import org.springframework.stereotype.Repository
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient
+import software.amazon.awssdk.enhanced.dynamodb.Expression
+import software.amazon.awssdk.enhanced.dynamodb.Key
+import software.amazon.awssdk.enhanced.dynamodb.TableSchema
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey
+import software.amazon.awssdk.enhanced.dynamodb.model.ScanEnhancedRequest
+import software.amazon.awssdk.services.dynamodb.model.AttributeValue
+import java.time.ZonedDateTime
 
-private const val STAFF_COLLECTION = "staff"
-
+@Repository
 class StaffRepositoryImpl(
-    private val mongoDatabase: MongoDatabase
+    dynamoDbEnhancedClient: DynamoDbEnhancedClient
 ) : StaffRepository {
+
+    private val table = dynamoDbEnhancedClient.table("fn-staffs", TableSchema.fromBean(StaffDynamo::class.java))
+
     override fun save(staff: Staff): Staff {
-        try {
-            return if (isAlreadyExistStaff(staff)) {
-                updateStaff(staff)
-            } else {
-                insertStaff(staff)
-            }
-        } catch (e: MongoException) {
-            throw Exception()
+        val existingStaff = findById(staff.id)
+        return if (isAlreadyExistStaff(staff)) {
+            table.updateItem(StaffDynamo(staff)).toStaff()
+        } else {
+            table.putItem(StaffDynamo(staff))
+            this.findById(staff.id) ?: throw DynamoStaffPutItemNotFoundException(
+                detail = mapOf(
+                    "id" to staff.id,
+                    "storeBranch" to staff.storeBranch,
+                    "name" to staff.name
+                )
+            )
         }
     }
 
-    private fun isAlreadyExistStaff(staff: Staff) = runBlocking {
-        mongoDatabase.getCollection<Staff>(STAFF_COLLECTION)
-            .find(eq("_id", staff.id))
-            .sort(org.bson.Document("createdAt", -1))
-            .firstOrNull() != null
+    private fun isAlreadyExistStaff(staff: Staff) = findById(staff.id) != null
+
+    override fun findById(id: String): Staff? =
+        table.getItem(Key.builder().partitionValue(id).build())?.toStaff()
+
+    override fun findByStoreBranchAndStatus(storeBranch: String, status: StaffStatus): List<Staff> {
+        val items = table.scan(
+            ScanEnhancedRequest.builder()
+                .filterExpression(
+                    Expression.builder()
+                        .expression("storeBranch = :storeBranch AND #status = :status")
+                        .putExpressionValue(":storeBranch", AttributeValue.fromS(storeBranch))
+                        .putExpressionName("#status", "status")
+                        .putExpressionValue(":status", AttributeValue.fromS(status.name))
+                        .build()
+                ).build()
+        ).items()
+
+        return items.map { it.toStaff() }
     }
 
-    private fun updateStaff(staff: Staff): Staff {
-        val query = eq("_id", staff.id)
-        val updateList = mutableListOf<Bson>()
-        for (property in Staff::class.memberProperties) {
-            val value = property.get(staff)
-            if (value != null) {
-                updateList.add(Updates.set(property.name, value))
-            }
-        }
+    override fun findByStoreBranchAndName(storeBranch: String, name: String): Staff? {
+        val items = table.scan(
+            ScanEnhancedRequest.builder()
+                .filterExpression(
+                    Expression.builder()
+                        .expression("storeBranch = :storeBranch AND #name = :name")
+                        .putExpressionValue(":storeBranch", AttributeValue.fromS(storeBranch))
+                        .putExpressionName("#name", "name")
+                        .putExpressionValue(":name", AttributeValue.fromS(name))
+                        .build()
+                ).build()
+        ).items()
 
-        val updates = Updates.combine(updateList)
-        val options = UpdateOptions().upsert(true)
-        return runBlocking {
-            mongoDatabase.getCollection<Staff>(STAFF_COLLECTION)
-                .updateOne(query, updates, options).let { staff }
-        }
+        return items.firstOrNull()?.toStaff()
     }
+}
 
-    private fun insertStaff(staff: Staff): Staff {
-        val result = runBlocking {
-            mongoDatabase.getCollection<Staff>(STAFF_COLLECTION).insertOne(staff)
-        }
+@DynamoDbBean
+class StaffDynamo(
+    @get:DynamoDbPartitionKey
+    var staff_id: String,
+    var storeBranch: String,
+    var name: String,
+    var status: StaffStatus,
+    var createdAt: ZonedDateTime,
+    var updatedAt: ZonedDateTime
+) {
+    constructor() : this(
+        staff_id = "",
+        storeBranch = "",
+        name = "",
+        status = StaffStatus.ACTIVE,
+        createdAt = ZonedDateTime.now(),
+        updatedAt = ZonedDateTime.now()
+    )
 
-        return runBlocking {
-            mongoDatabase.getCollection<Staff>(STAFF_COLLECTION)
-                .withDocumentClass<Staff>()
-                .find(eq("_id", result.insertedId))
-                .firstOrNull() ?: throw Exception()
-        }
-    }
+    constructor(staff: Staff) : this(
+        staff_id = staff.id,
+        storeBranch = staff.storeBranch,
+        name = staff.name,
+        status = staff.status,
+        createdAt = staff.createdAt,
+        updatedAt = ZonedDateTime.now()
+    )
 
-    override fun findByStoreBranchAndStatus(storeBranch: String, status: StaffStatus): List<Staff> =
-        runBlocking {
-            mongoDatabase.getCollection<Staff>(STAFF_COLLECTION)
-                .find(and(
-                    eq(Staff::storeBranch.name, storeBranch),
-                    eq(Staff::status.name, status)
-                ))
-                .toList()
-        }
-
-    override fun findByStoreBranchAndName(storeBranch: String, name: String): Staff? =
-        runBlocking {
-            mongoDatabase.getCollection<Staff>(STAFF_COLLECTION)
-                .find(and(
-                    eq(Staff::storeBranch.name, storeBranch),
-                    eq((Staff::name.name), name)
-                )).firstOrNull()
-        }
+    fun toStaff(): Staff =
+        Staff(
+            id = this.staff_id,
+            storeBranch = this.storeBranch,
+            name = this.name,
+            status = this.status,
+            createdAt = this.createdAt,
+            updatedAt = this.updatedAt
+        )
 }

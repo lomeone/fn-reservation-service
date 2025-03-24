@@ -1,105 +1,137 @@
 package com.lomeone.fnreservation.infrastructure.reservation.repository
 
 import com.lomeone.fnreservation.domain.reservation.entity.Reservation
+import com.lomeone.fnreservation.domain.reservation.entity.ReservationStatus
 import com.lomeone.fnreservation.domain.reservation.repository.ReservationRepository
-import com.mongodb.MongoException
-import com.mongodb.client.model.Filters.*
-import com.mongodb.client.model.UpdateOptions
-import com.mongodb.client.model.Updates
-import com.mongodb.kotlin.client.coroutine.MongoDatabase
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.runBlocking
-import org.bson.conversions.Bson
-import org.slf4j.LoggerFactory
-import kotlin.reflect.full.memberProperties
+import com.lomeone.fnreservation.infrastructure.reservation.exception.DynamoReservationPutItemNotFoundException
+import com.lomeone.fnreservation.infrastructure.reservation.repository.ReservationDynamo.Entry
+import org.springframework.stereotype.Repository
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient
+import software.amazon.awssdk.enhanced.dynamodb.Expression
+import software.amazon.awssdk.enhanced.dynamodb.Key
+import software.amazon.awssdk.enhanced.dynamodb.TableSchema
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey
+import software.amazon.awssdk.enhanced.dynamodb.model.ScanEnhancedRequest
+import software.amazon.awssdk.services.dynamodb.model.AttributeValue
+import java.time.ZonedDateTime
 
-private const val RESERVATION_COLLECTION = "reservation"
-
+@Repository
 class ReservationRepositoryImpl(
-    private val mongoDatabase: MongoDatabase
+    dynamoDbEnhancedClient: DynamoDbEnhancedClient
 ) : ReservationRepository {
 
-    private val log = LoggerFactory.getLogger(this.javaClass)
-
-    override fun findByStoreBranchAndLatestGameType(storeBranch: String, gameType: String): Reservation? =
-        runBlocking {
-            mongoDatabase.getCollection<Reservation>(RESERVATION_COLLECTION)
-                .find(and(
-                    eq(Reservation::storeBranch.name, storeBranch),
-                    eq(Reservation::gameType.name, gameType),
-                    gte(Reservation::session.name, 0)
-                ))
-                .sort(org.bson.Document("createdAt", -1))
-                .firstOrNull()
-        }
-
-    override fun findByStoreBranchAndGameTypeAndSession(
-        storeBranch: String,
-        gameType: String,
-        session: Int
-    ): Reservation? = runBlocking {
-        mongoDatabase.getCollection<Reservation>(RESERVATION_COLLECTION)
-            .find(and(
-                eq(Reservation::storeBranch.name, storeBranch),
-                eq(Reservation::gameType.name, gameType),
-                eq(Reservation::session.name, session)
-            ))
-            .sort(org.bson.Document("createdAt", -1))
-            .firstOrNull()
-    }
+    private val table = dynamoDbEnhancedClient.table("fn-reservations", TableSchema.fromBean(ReservationDynamo::class.java))
 
     override fun save(reservation: Reservation): Reservation {
-        try {
-            return if (isAlreadyExistReservation(reservation)) {
-                updateReservation(reservation)
-            } else {
-                insertReservation(reservation)
-            }
-        } catch (e: MongoException) {
-            log.error("Unable to insert due to an error: $e")
-            throw Exception()
+        return if (isAlreadyExistReservation(reservation)) {
+            table.updateItem(ReservationDynamo(reservation = reservation)).toReservation()
+        } else {
+            table.putItem(ReservationDynamo(reservation = reservation))
+            this.findById(reservation.id) ?: throw DynamoReservationPutItemNotFoundException(
+                detail = mapOf(
+                    "id" to reservation.id,
+                    "storeBranch" to reservation.storeBranch,
+                    "gameType" to reservation.gameType,
+                    "session" to reservation.session
+                )
+            )
         }
     }
 
-    private fun isAlreadyExistReservation(reservation: Reservation) = runBlocking {
-        mongoDatabase.getCollection<Reservation>(RESERVATION_COLLECTION)
-            .find(eq("_id", reservation.id))
-            .sort(org.bson.Document("createdAt", -1))
-            .firstOrNull() != null
+    private fun isAlreadyExistReservation(reservation: Reservation) = findById(reservation.id) != null
+
+    override fun findById(id: String): Reservation? =
+        table.getItem(Key.builder().partitionValue(id).build())?.toReservation()
+
+    override fun findByStoreBranchAndLatestGameType(storeBranch: String, gameType: String): Reservation? {
+        val items = table.scan(
+            ScanEnhancedRequest.builder()
+                .filterExpression(
+                    Expression.builder()
+                        .expression("storeBranch = :storeBranch AND gameType = :gameType")
+                        .putExpressionValue(":storeBranch", AttributeValue.builder().s(storeBranch).build())
+                        .putExpressionValue(":gameType", AttributeValue.builder().s(gameType).build())
+                        .build()
+                ).build()
+        ).items()
+        val reservations = items.sortedBy { it.session }
+
+        return reservations.lastOrNull()?.toReservation()
     }
 
-    private fun updateReservation(reservation: Reservation): Reservation {
-        val query = eq("_id", reservation.id)
-        val updateList = mutableListOf<Bson>()
-        for (property in Reservation::class.memberProperties) {
-            if (property.name != Reservation::id.name) {
-                val value = property.get(reservation)
-                if (value != null) {
-                    updateList.add(Updates.set(property.name, value))
-                }
-            }
-        }
-
-        val updates = Updates.combine(updateList)
-
-        val options = UpdateOptions().upsert(true)
-        return runBlocking {
-            mongoDatabase.getCollection<Reservation>(RESERVATION_COLLECTION)
-                .updateOne(query, updates, options).let { reservation }
-        }
-    }
-
-    private fun insertReservation(reservation: Reservation): Reservation {
-
-        val result = runBlocking {
-            mongoDatabase.getCollection<Reservation>(RESERVATION_COLLECTION).insertOne(reservation)
-        }
-
-        return runBlocking {
-            mongoDatabase.getCollection<Reservation>(RESERVATION_COLLECTION)
-                .withDocumentClass<Reservation>()
-                .find(eq("_id", result.insertedId))
-                .firstOrNull() ?: throw Exception()
-        }
+    override fun findByStoreBranchAndGameTypeAndSession(storeBranch: String, gameType: String, session: Int): Reservation? {
+        val items = table.scan(
+            ScanEnhancedRequest.builder()
+                .filterExpression(
+                    Expression.builder()
+                        .expression("storeBranch = :storeBranch AND gameType = :gameType AND #session = :session")
+                        .putExpressionValue(":storeBranch", AttributeValue.builder().s(storeBranch).build())
+                        .putExpressionValue(":gameType", AttributeValue.builder().s(gameType).build())
+                        .putExpressionName("#session", "session")
+                        .putExpressionValue(":session", AttributeValue.builder().n(session.toString()).build())
+                        .build()
+                )
+                .build()
+        ).items()
+        return items.firstOrNull()?.toReservation()
     }
 }
+
+@DynamoDbBean
+class ReservationDynamo(
+    @get:DynamoDbPartitionKey
+    var reservations_id: String,
+    var storeBranch: String,
+    var gameType: String,
+    var session: Int = 0,
+    var reservation: List<Entry>,
+    var status: ReservationStatus,
+    var createdAt: ZonedDateTime,
+    var updatedAt: ZonedDateTime
+) {
+    @DynamoDbBean
+    data class Entry(var key: String = "", var value: String = "")
+
+    constructor() : this(
+        reservations_id = "",
+        storeBranch = "",
+        gameType = "",
+        status = ReservationStatus.OPEN,
+        reservation = listOf(),
+        createdAt = ZonedDateTime.now(),
+        updatedAt = ZonedDateTime.now()
+    )
+
+    constructor(reservation: Reservation) : this(
+        reservations_id = reservation.id,
+        storeBranch = reservation.storeBranch,
+        gameType = reservation.gameType,
+        session = reservation.session,
+        reservation = reservation.reservation.toEntryList(),
+        status = reservation.status,
+        createdAt = reservation.createdAt,
+        updatedAt = ZonedDateTime.now()
+    )
+
+    fun toReservation(): Reservation =
+        Reservation(
+            id = this.reservations_id,
+            storeBranch = this.storeBranch,
+            gameType = this.gameType,
+            session = this.session,
+            reservation = reservation.toMap(),
+            status = this.status,
+            createdAt = this.createdAt,
+            updatedAt = this.updatedAt
+        )
+}
+
+
+private fun Map<String, String>.toEntryList(): List<Entry> =
+    this.map { Entry(it.key, it.value) }
+
+private fun List<Entry>.toMap(): LinkedHashMap<String, String> =
+    LinkedHashMap<String, String>().apply {
+        this@toMap.forEach { put(it.key, it.value) }
+    }

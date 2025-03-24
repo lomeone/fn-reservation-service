@@ -9,7 +9,4 @@
     <root level="INFO">
         <appender-ref ref="STDOUT" />
     </root>
-
-    <!-- Ktor의 로그 레벨 설정 -->
-    <logger name="io.ktor" level="INFO"/>
 </configuration>

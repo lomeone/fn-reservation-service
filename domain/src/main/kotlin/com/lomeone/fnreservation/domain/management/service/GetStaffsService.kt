@@ -2,7 +2,9 @@ package com.lomeone.fnreservation.domain.management.service
 
 import com.lomeone.fnreservation.domain.management.entity.StaffStatus
 import com.lomeone.fnreservation.domain.management.repository.StaffRepository
+import org.springframework.stereotype.Service
 
+@Service
 class GetStaffsService(
     private val staffRepository: StaffRepository
 ) {

@@ -1,0 +1,26 @@
+server:
+  shutdown: graceful
+
+database:
+  dynamo:
+    region: ap-northeast-2
+    host: https://dynamodb.ap-northeast-2.amazonaws.com
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,metrics,prometheus"
+
+  tracing:
+    enabled: true
+
+micrometer:
+  tracing:
+    bridge:
+      brave:
+        enabled: trueg
+
+logging:
+  level:
+    root: info

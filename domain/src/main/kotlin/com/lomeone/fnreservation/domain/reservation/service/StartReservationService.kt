@@ -5,7 +5,9 @@ import com.lomeone.fnreservation.domain.reservation.exception.AlreadyReservedSes
 import com.lomeone.fnreservation.domain.reservation.exception.ReservationInProgressException
 import com.lomeone.fnreservation.domain.reservation.exception.ReservationNotFoundException
 import com.lomeone.fnreservation.domain.reservation.repository.ReservationRepository
+import org.springframework.stereotype.Service
 
+@Service
 class StartReservationService(
     private val reservationRepository: ReservationRepository
 ) {

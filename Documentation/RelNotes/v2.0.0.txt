@@ -1,0 +1,7 @@
+fn-reservation-service v2.0.0 Release Notes
+===========================================
+
+* New Feature
+1. Migrate Spring boot
+2. Migrate dynamodb
+3. Add kover test coverage
