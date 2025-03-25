@@ -33,5 +33,11 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
+      - name: Install aws cli
+        run: |
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          sudo ./aws/install
+
       - name: Image pull in ecr cache
         run: docker pull 396428372646.dkr.ecr.ap-northeast-2.amazonaws.com/docker-hub/comstering/fn-reservation-service:${GITHUB_REF_NAME//\//-}
