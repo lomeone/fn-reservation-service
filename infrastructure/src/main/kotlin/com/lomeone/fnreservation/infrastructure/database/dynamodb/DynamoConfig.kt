@@ -3,7 +3,7 @@ package com.lomeone.fnreservation.infrastructure.database.dynamodb
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider
+import software.amazon.awssdk.auth.credentials.WebIdentityTokenFileCredentialsProvider
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
@@ -19,7 +19,7 @@ class DynamoConfig {
     fun dynamoDbClient(): DynamoDbClient =
         DynamoDbClient.builder()
             .region(Region.of(region))
-            .credentialsProvider(DefaultCredentialsProvider.create())
+            .credentialsProvider(WebIdentityTokenFileCredentialsProvider.create())
             .endpointOverride(URI.create(host))
             .build()
 
