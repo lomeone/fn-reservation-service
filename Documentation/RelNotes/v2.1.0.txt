@@ -1,0 +1,6 @@
+fn-reservation-service v2.1.0 Release Notes
+===========================================
+
+* Fix Bug
+1. Fix sts bug
+2. Fix workflow for not deploy

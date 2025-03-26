@@ -41,17 +41,17 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Check github sha
+      - name: Install aws cli
         run: |
-          echo $GITHUB_SHA
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          sudo ./aws/install
 
-      - name: Image pull in ecr cache (PR)
-        if: github.event_name == 'pull_request'
+      - name: Image pull in ecr cache
         run: docker pull 396428372646.dkr.ecr.ap-northeast-2.amazonaws.com/docker-hub/comstering/fn-reservation-service:${GITHUB_SHA::7}
 
-      - name: Image pull in ecr cache (Push)
+      - name: Move develop image tag (Push)
         if: github.event_name == 'push'
         run: |
-          docker pull 396428372646.dkr.ecr.ap-northeast-2.amazonaws.com/docker-hub/comstering/fn-reservation-service:${GITHUB_SHA::7}
           export MANIFEST=$(aws ecr batch-get-image --repository-name docker-hub/comstering/fn-reservation-service --image-ids imageTag=${GITHUB_SHA::7} --query 'images[].imageManifest' --output text)
           aws ecr put-image --repository-name docker-hub/comstering/fn-reservation-service --image-tag develop --image-manifest $MANIFEST
