@@ -14,7 +14,7 @@ class Reservation(
     val updatedAt: ZonedDateTime = ZonedDateTime.now()
 ) {
     val id: String = id ?: MessageDigest.getInstance("SHA-256")
-        .digest("${storeBranch}_${gameType}_${session}".toByteArray())
+        .digest("${storeBranch}_${gameType}".toByteArray())
         .joinToString("") { "%02x".format(it) }
 
     private val _reservation: LinkedHashMap<String, String> = reservation
