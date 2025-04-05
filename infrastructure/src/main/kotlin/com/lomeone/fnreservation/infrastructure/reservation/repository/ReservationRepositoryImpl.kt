@@ -28,7 +28,8 @@ class ReservationRepositoryImpl(
             table.updateItem(ReservationDynamo(reservation = reservation)).toReservation()
         } else {
             table.putItem(ReservationDynamo(reservation = reservation))
-            this.findByIdAndSession(reservation.id, reservation.session) ?: throw DynamoReservationPutItemNotFoundException(
+            val partitionKey = generatePartitionKey(reservation.storeBranch, reservation.gameType)
+            this.findByIdAndSession(partitionKey, reservation.session) ?: throw DynamoReservationPutItemNotFoundException(
                 detail = mapOf(
                     "id" to reservation.id,
                     "storeBranch" to reservation.storeBranch,
@@ -39,7 +40,8 @@ class ReservationRepositoryImpl(
         }
     }
 
-    private fun isAlreadyExistReservation(reservation: Reservation) = findByIdAndSession(reservation.id, reservation.session) != null
+    private fun isAlreadyExistReservation(reservation: Reservation) =
+        reservation.id.isNotBlank() && findByIdAndSession(reservation.id, reservation.session) != null
 
     override fun findByIdAndSession(id: String, session: Int): Reservation? =
         table.getItem(Key.builder().partitionValue(id).sortValue(session).build())?.toReservation()
@@ -91,6 +93,14 @@ class ReservationDynamo(
 ) {
     @DynamoDbBean
     data class Entry(var key: String = "", var value: String = "")
+
+    init {
+        if (reservations_id.isBlank()) {
+            reservations_id = MessageDigest.getInstance("SHA-256")
+                .digest("${storeBranch}_${gameType}".toByteArray())
+                .joinToString("") { "%02x".format(it) }
+        }
+    }
 
     constructor() : this(
         reservations_id = "",
