@@ -44,7 +44,10 @@ class ReservationRepositoryImpl(
         reservation.id.isNotBlank() && findByIdAndSession(reservation.id, reservation.session) != null
 
     override fun findByIdAndSession(id: String, session: Int): Reservation? =
-        table.getItem(Key.builder().partitionValue(id).sortValue(session).build())?.toReservation()
+        table.getItem {
+            it.key(Key.builder().partitionValue(id).sortValue(session).build())
+                .consistentRead(true)
+        }?.toReservation()
 
     override fun findByStoreBranchAndLatestGameType(storeBranch: String, gameType: String): Reservation? {
         val partitionKey = generatePartitionKey(storeBranch, gameType)
@@ -55,6 +58,7 @@ class ReservationRepositoryImpl(
                     Key.builder().partitionValue(partitionKey).build()
                 )
             ).scanIndexForward(false).limit(1)
+                .consistentRead(true)
         }.firstOrNull()
 
         val reservations = page?.items()
@@ -70,9 +74,10 @@ class ReservationRepositoryImpl(
     override fun findByStoreBranchAndGameTypeAndSession(storeBranch: String, gameType: String, session: Int): Reservation? {
         val partitionKey = generatePartitionKey(storeBranch, gameType)
 
-        val key = Key.builder().partitionValue(partitionKey).sortValue(session).build()
-
-        val item = table.getItem(key)
+        val item = table.getItem {
+            it.key(Key.builder().partitionValue(partitionKey).sortValue(session).build())
+                .consistentRead(true)
+        }
 
         return item?.toReservation()
     }

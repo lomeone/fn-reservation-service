@@ -1,0 +1,5 @@
+fn-reservation-service v2.2.1 Release Notes
+===========================================
+
+* Bug Fix
+1. Fix sometimes read reservation data return null
