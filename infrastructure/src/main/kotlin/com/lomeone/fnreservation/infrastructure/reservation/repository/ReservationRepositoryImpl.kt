@@ -7,13 +7,13 @@ import com.lomeone.fnreservation.infrastructure.reservation.exception.DynamoRese
 import com.lomeone.fnreservation.infrastructure.reservation.repository.ReservationDynamo.Entry
 import org.springframework.stereotype.Repository
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient
-import software.amazon.awssdk.enhanced.dynamodb.Expression
 import software.amazon.awssdk.enhanced.dynamodb.Key
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey
-import software.amazon.awssdk.enhanced.dynamodb.model.ScanEnhancedRequest
-import software.amazon.awssdk.services.dynamodb.model.AttributeValue
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey
+import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional
+import java.security.MessageDigest
 import java.time.ZonedDateTime
 
 @Repository
@@ -28,7 +28,8 @@ class ReservationRepositoryImpl(
             table.updateItem(ReservationDynamo(reservation = reservation)).toReservation()
         } else {
             table.putItem(ReservationDynamo(reservation = reservation))
-            this.findById(reservation.id) ?: throw DynamoReservationPutItemNotFoundException(
+            val partitionKey = generatePartitionKey(reservation.storeBranch, reservation.gameType)
+            this.findByIdAndSession(partitionKey, reservation.session) ?: throw DynamoReservationPutItemNotFoundException(
                 detail = mapOf(
                     "id" to reservation.id,
                     "storeBranch" to reservation.storeBranch,
@@ -39,42 +40,41 @@ class ReservationRepositoryImpl(
         }
     }
 
-    private fun isAlreadyExistReservation(reservation: Reservation) = findById(reservation.id) != null
+    private fun isAlreadyExistReservation(reservation: Reservation) =
+        reservation.id.isNotBlank() && findByIdAndSession(reservation.id, reservation.session) != null
 
-    override fun findById(id: String): Reservation? =
-        table.getItem(Key.builder().partitionValue(id).build())?.toReservation()
+    override fun findByIdAndSession(id: String, session: Int): Reservation? =
+        table.getItem(Key.builder().partitionValue(id).sortValue(session).build())?.toReservation()
 
     override fun findByStoreBranchAndLatestGameType(storeBranch: String, gameType: String): Reservation? {
-        val items = table.scan(
-            ScanEnhancedRequest.builder()
-                .filterExpression(
-                    Expression.builder()
-                        .expression("storeBranch = :storeBranch AND gameType = :gameType")
-                        .putExpressionValue(":storeBranch", AttributeValue.builder().s(storeBranch).build())
-                        .putExpressionValue(":gameType", AttributeValue.builder().s(gameType).build())
-                        .build()
-                ).build()
-        ).items()
-        val reservations = items.sortedBy { it.session }
+        val partitionKey = generatePartitionKey(storeBranch, gameType)
 
-        return reservations.lastOrNull()?.toReservation()
+        val page = table.query { query ->
+            query.queryConditional(
+                QueryConditional.keyEqualTo(
+                    Key.builder().partitionValue(partitionKey).build()
+                )
+            ).scanIndexForward(false).limit(1)
+        }.firstOrNull()
+
+        val reservations = page?.items()
+
+        return reservations?.firstOrNull()?.toReservation()
     }
 
+    private fun generatePartitionKey(storeBranch: String, gameType: String): String =
+        MessageDigest.getInstance("SHA-256")
+            .digest("${storeBranch}_${gameType}".toByteArray())
+            .joinToString("") { "%02x".format(it) }
+
     override fun findByStoreBranchAndGameTypeAndSession(storeBranch: String, gameType: String, session: Int): Reservation? {
-        val items = table.scan(
-            ScanEnhancedRequest.builder()
-                .filterExpression(
-                    Expression.builder()
-                        .expression("storeBranch = :storeBranch AND gameType = :gameType AND #session = :session")
-                        .putExpressionValue(":storeBranch", AttributeValue.builder().s(storeBranch).build())
-                        .putExpressionValue(":gameType", AttributeValue.builder().s(gameType).build())
-                        .putExpressionName("#session", "session")
-                        .putExpressionValue(":session", AttributeValue.builder().n(session.toString()).build())
-                        .build()
-                )
-                .build()
-        ).items()
-        return items.firstOrNull()?.toReservation()
+        val partitionKey = generatePartitionKey(storeBranch, gameType)
+
+        val key = Key.builder().partitionValue(partitionKey).sortValue(session).build()
+
+        val item = table.getItem(key)
+
+        return item?.toReservation()
     }
 }
 
@@ -84,6 +84,7 @@ class ReservationDynamo(
     var reservations_id: String,
     var storeBranch: String,
     var gameType: String,
+    @get:DynamoDbSortKey
     var session: Int = 0,
     var reservation: List<Entry>,
     var status: ReservationStatus,
@@ -92,6 +93,14 @@ class ReservationDynamo(
 ) {
     @DynamoDbBean
     data class Entry(var key: String = "", var value: String = "")
+
+    init {
+        if (reservations_id.isBlank()) {
+            reservations_id = MessageDigest.getInstance("SHA-256")
+                .digest("${storeBranch}_${gameType}".toByteArray())
+                .joinToString("") { "%02x".format(it) }
+        }
+    }
 
     constructor() : this(
         reservations_id = "",

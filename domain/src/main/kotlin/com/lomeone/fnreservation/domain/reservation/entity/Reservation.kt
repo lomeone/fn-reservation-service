@@ -1,6 +1,5 @@
 package com.lomeone.fnreservation.domain.reservation.entity
 
-import java.security.MessageDigest
 import java.time.ZonedDateTime
 
 class Reservation(
@@ -13,9 +12,7 @@ class Reservation(
     val createdAt: ZonedDateTime = ZonedDateTime.now(),
     val updatedAt: ZonedDateTime = ZonedDateTime.now()
 ) {
-    val id: String = id ?: MessageDigest.getInstance("SHA-256")
-        .digest("${storeBranch}_${gameType}_${session}".toByteArray())
-        .joinToString("") { "%02x".format(it) }
+    val id: String = id ?: ""
 
     private val _reservation: LinkedHashMap<String, String> = reservation
     val reservation: Map<String, String> get() = this._reservation.toMap()

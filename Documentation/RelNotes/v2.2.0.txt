@@ -1,0 +1,5 @@
+fn-reservation-service v2.2.0 Release Notes
+===========================================
+
+* New Feature
+1. Refactor dynamodb structure for partition key and sort key
