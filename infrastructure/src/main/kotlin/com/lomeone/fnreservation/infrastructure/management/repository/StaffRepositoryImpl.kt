@@ -23,7 +23,6 @@ class StaffRepositoryImpl(
     private val table = dynamoDbEnhancedClient.table("fn-staffs", TableSchema.fromBean(StaffDynamo::class.java))
 
     override fun save(staff: Staff): Staff {
-        val existingStaff = findById(staff.id)
         return if (isAlreadyExistStaff(staff)) {
             table.updateItem(StaffDynamo(staff)).toStaff()
         } else {
