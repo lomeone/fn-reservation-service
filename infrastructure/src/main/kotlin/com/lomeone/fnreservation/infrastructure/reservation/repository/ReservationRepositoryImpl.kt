@@ -21,7 +21,7 @@ class ReservationRepositoryImpl(
     dynamoDbEnhancedClient: DynamoDbEnhancedClient
 ) : ReservationRepository {
 
-    private val table = dynamoDbEnhancedClient.table("fn-reservation-v2", TableSchema.fromBean(ReservationDynamo::class.java))
+    private val table = dynamoDbEnhancedClient.table("fn-reservations", TableSchema.fromBean(ReservationDynamo::class.java))
 
     override fun save(reservation: Reservation): Reservation {
         return if (isAlreadyExistReservation(reservation)) {
