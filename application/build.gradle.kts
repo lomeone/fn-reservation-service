@@ -1,7 +1,9 @@
 import java.io.ByteArrayOutputStream
 
-val prometheusVersion: String by project
+val micrometerRegistryVersion: String by project
 val micrometerTracingVersion: String by project
+val opentelemetryVersion: String by project
+val opentelemetryInstrumentationVersion: String by project
 val eunoiaSpringWebRestVersion: String by project
 
 val image_registry: String by project
@@ -24,9 +26,13 @@ dependencies {
 
     // Observability
     implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("io.micrometer:micrometer-registry-prometheus:${prometheusVersion}")
-    implementation("io.micrometer:micrometer-tracing:${micrometerTracingVersion}")
-    implementation("io.micrometer:micrometer-tracing-bridge-brave:${micrometerTracingVersion}")
+    implementation("io.micrometer:micrometer-registry-prometheus:$micrometerRegistryVersion")
+    implementation(platform("io.micrometer:micrometer-tracing-bom:$micrometerTracingVersion"))
+    implementation("io.micrometer:micrometer-tracing")
+    implementation("io.micrometer:micrometer-tracing-bridge-otel")
+    implementation("io.opentelemetry:opentelemetry-exporter-otlp:$opentelemetryVersion")
+//    implementation(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:$opentelemetryInstrumentationVersion"))
+//    implementation("io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter")
 
     implementation("com.lomeone.eunoia:spring-web-rest:$eunoiaSpringWebRestVersion")
 }
