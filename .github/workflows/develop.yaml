@@ -29,7 +29,7 @@ jobs:
     environment: dev
     name: Deploy develop
     needs: [build]
-    runs-on: lomeone-arc-runner-set
+    runs-on: ubuntu-latest
     steps:
       - name: Configure AWS Credential
         uses: aws-actions/configure-aws-credentials@v4
