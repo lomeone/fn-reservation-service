@@ -30,7 +30,8 @@ dependencies {
     implementation(platform("io.micrometer:micrometer-tracing-bom:$micrometerTracingVersion"))
     implementation("io.micrometer:micrometer-tracing")
     implementation("io.micrometer:micrometer-tracing-bridge-otel")
-    implementation("io.opentelemetry:opentelemetry-exporter-otlp:$opentelemetryVersion")
+    implementation(platform("io.opentelemetry:opentelemetry-bom:$opentelemetryVersion"))
+    implementation("io.opentelemetry:opentelemetry-exporter-otlp")
 //    implementation(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:$opentelemetryInstrumentationVersion"))
 //    implementation("io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter")
 
