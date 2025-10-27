@@ -84,6 +84,7 @@ dependencies {
 
 sonar {
     properties {
+        property("sonar.organization", "lomeone")
         property("sonar.projectKey", "lomeone_fn-reservation-service")
         property("sonar.projectName", "fn-reservation-service")
         property("sonar.coverage.jacoco.xmlReportPaths", "${projectDir}/build/reports/kover/report.xml")
