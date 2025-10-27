@@ -100,7 +100,7 @@ coveralls {
 fun getGitHash(): String {
     val stdout = ByteArrayOutputStream()
     exec {
-        commandLine = listOf("git", "rev-parse", "--short", "HEAD")
+        commandLine = listOf("git", "rev-parse", "--short=10", "HEAD")
         standardOutput = stdout
     }
     return stdout.toString().trim()

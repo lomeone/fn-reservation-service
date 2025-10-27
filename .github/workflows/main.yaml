@@ -41,6 +41,6 @@ jobs:
 
       - name: Image pull in ecr cache
         run: |
-          docker pull 396428372646.dkr.ecr.ap-northeast-2.amazonaws.com/docker-hub/comstering/fn-reservation-service:${GITHUB_SHA::7}
-          export MANIFEST=$(aws ecr batch-get-image --repository-name docker-hub/comstering/fn-reservation-service --image-ids imageTag=${GITHUB_SHA::7} --query 'images[].imageManifest' --output text)
+          docker pull 396428372646.dkr.ecr.ap-northeast-2.amazonaws.com/docker-hub/comstering/fn-reservation-service:${GITHUB_SHA::10}
+          export MANIFEST=$(aws ecr batch-get-image --repository-name docker-hub/comstering/fn-reservation-service --image-ids imageTag=${GITHUB_SHA::10} --query 'images[].imageManifest' --output text)
           aws ecr put-image --repository-name docker-hub/comstering/fn-reservation-service --image-tag main --image-manifest $MANIFEST

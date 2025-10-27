@@ -48,10 +48,10 @@ jobs:
           sudo ./aws/install
 
       - name: Image pull in ecr cache
-        run: docker pull 396428372646.dkr.ecr.ap-northeast-2.amazonaws.com/docker-hub/comstering/fn-reservation-service:${GITHUB_SHA::7}
+        run: docker pull 396428372646.dkr.ecr.ap-northeast-2.amazonaws.com/docker-hub/comstering/fn-reservation-service:${GITHUB_SHA::10}
 
       - name: Move develop image tag (Push)
         if: github.event_name == 'push'
         run: |
-          export MANIFEST=$(aws ecr batch-get-image --repository-name docker-hub/comstering/fn-reservation-service --image-ids imageTag=${GITHUB_SHA::7} --query 'images[].imageManifest' --output text)
+          export MANIFEST=$(aws ecr batch-get-image --repository-name docker-hub/comstering/fn-reservation-service --image-ids imageTag=${GITHUB_SHA::10} --query 'images[].imageManifest' --output text)
           aws ecr put-image --repository-name docker-hub/comstering/fn-reservation-service --image-tag develop --image-manifest $MANIFEST
