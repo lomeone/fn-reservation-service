@@ -21,7 +21,7 @@ jobs:
     environment: staging
     name: Deploy staging
     needs: [build]
-    runs-on: lomeone-arc-runner-set
+    runs-on: ubuntu-24.04-arm
     steps:
       - name: Configure AWS Credential
         uses: aws-actions/configure-aws-credentials@v4
@@ -37,7 +37,7 @@ jobs:
         run: |
           curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip"
           unzip awscliv2.zip
-          sudo ./aws/install
+          sudo ./aws/install --update
 
       - name: Image pull in ecr cache
         run: |
