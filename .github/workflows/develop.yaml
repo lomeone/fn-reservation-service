@@ -29,7 +29,7 @@ jobs:
     environment: dev
     name: Deploy develop
     needs: [build]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     steps:
       - name: Configure AWS Credential
         uses: aws-actions/configure-aws-credentials@v4
