@@ -46,7 +46,7 @@ jib {
         )
     }
     from {
-        image = "amazoncorretto:21-alpine3.21"
+        image = "public.ecr.aws/amazoncorretto:21-alpine3.21"
         platforms {
             platform {
                 architecture = "amd64"
