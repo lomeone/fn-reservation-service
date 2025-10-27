@@ -84,6 +84,7 @@ dependencies {
 
 sonar {
     properties {
+        property("sonar.organization", "lomeone")
         property("sonar.projectKey", "lomeone_fn-reservation-service")
         property("sonar.projectName", "fn-reservation-service")
         property("sonar.coverage.jacoco.xmlReportPaths", "${projectDir}/build/reports/kover/report.xml")
@@ -99,7 +100,7 @@ coveralls {
 fun getGitHash(): String {
     val stdout = ByteArrayOutputStream()
     exec {
-        commandLine = listOf("git", "rev-parse", "--short", "HEAD")
+        commandLine = listOf("git", "rev-parse", "--short=10", "HEAD")
         standardOutput = stdout
     }
     return stdout.toString().trim()

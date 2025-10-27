@@ -1,3 +1,7 @@
+spring:
+  application:
+    name: fn-reservation-service
+
 server:
   shutdown: graceful
 
@@ -15,11 +19,11 @@ management:
   tracing:
     enabled: true
 
-micrometer:
-  tracing:
-    bridge:
-      brave:
-        enabled: trueg
+  otlp:
+    tracing:
+      export:
+        enabled: true
+      endpoint: http://jaeger-inmemory-instance-collector.observability.svc.cluster.local:4318
 
 logging:
   level:

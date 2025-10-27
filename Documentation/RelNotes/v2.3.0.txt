@@ -1,0 +1,5 @@
+fn-reservation-service v2.3.0 Release Notes
+===========================================
+
+* New Feature
+1. Trace open telemetry
