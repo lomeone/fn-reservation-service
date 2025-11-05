@@ -23,7 +23,8 @@ logging:
 otel:
   exporter:
     otlp:
-      endpoint: http://jaeger-inmemory-instance-collector.observability.svc.cluster.local:4318
+      traces:
+        endpoint: http://jaeger-inmemory-instance-collector.observability.svc.cluster.local:4318/v1/traces
 
   resource:
     attributes:
