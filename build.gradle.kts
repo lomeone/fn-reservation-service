@@ -1,10 +1,11 @@
+import org.springframework.boot.gradle.plugin.SpringBootPlugin
 import java.io.ByteArrayOutputStream
 
 val group_name: String by project
 
-val mongodbDriverVersion: String by project
-
 val logback_version: String by project
+val opentelemetryVersion: String by project
+val opentelemetryInstrumentationVersion: String by project
 val eunoiaExceptionVersion: String by project
 
 plugins {
@@ -42,6 +43,19 @@ allprojects {
                 password = System.getenv("GITHUB_TOKEN")
             }
         }
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:$opentelemetryInstrumentationVersion")
+        }
+    }
+
+    dependencies {
+        implementation(platform(SpringBootPlugin.BOM_COORDINATES))
+
+        // Observability
+        implementation("io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter")
     }
 
     tasks.test {
