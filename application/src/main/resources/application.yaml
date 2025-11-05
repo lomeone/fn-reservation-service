@@ -38,3 +38,6 @@ otel:
       service:
         name: fn-reservation-service
         namespace: final-nine
+    providers:
+      aws:
+        enabled: true
