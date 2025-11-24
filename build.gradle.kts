@@ -48,6 +48,7 @@ allprojects {
     dependencyManagement {
         imports {
             mavenBom("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:$opentelemetryInstrumentationVersion")
+            mavenBom("io.opentelemetry:opentelemetry-bom:$opentelemetryVersion")
         }
     }
 
@@ -56,6 +57,7 @@ allprojects {
 
         // Observability
         implementation("io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter")
+        implementation("io.opentelemetry:opentelemetry-extension-aws")
     }
 
     tasks.test {
