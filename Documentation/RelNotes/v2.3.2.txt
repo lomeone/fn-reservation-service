@@ -1,0 +1,5 @@
+fn-reservation-service v2.3.2 Release Notes
+===========================================
+
+* Bug Fix
+1. Fix otlp dynamodb resource span collect
