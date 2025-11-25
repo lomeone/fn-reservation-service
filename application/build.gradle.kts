@@ -1,16 +1,12 @@
 import java.io.ByteArrayOutputStream
 
 val micrometerRegistryVersion: String by project
-val micrometerTracingVersion: String by project
-val opentelemetryVersion: String by project
-val opentelemetryInstrumentationVersion: String by project
 val eunoiaSpringWebRestVersion: String by project
 
 val image_registry: String by project
 val service_name: String by project
 
-plugins {
-}
+plugins {}
 
 dependencies {
     implementation(project(":domain"))
@@ -27,13 +23,6 @@ dependencies {
     // Observability
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("io.micrometer:micrometer-registry-prometheus:$micrometerRegistryVersion")
-    implementation(platform("io.micrometer:micrometer-tracing-bom:$micrometerTracingVersion"))
-    implementation("io.micrometer:micrometer-tracing")
-    implementation("io.micrometer:micrometer-tracing-bridge-otel")
-    implementation(platform("io.opentelemetry:opentelemetry-bom:$opentelemetryVersion"))
-    implementation("io.opentelemetry:opentelemetry-exporter-otlp")
-//    implementation(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:$opentelemetryInstrumentationVersion"))
-//    implementation("io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter")
 
     implementation("com.lomeone.eunoia:spring-web-rest:$eunoiaSpringWebRestVersion")
 }

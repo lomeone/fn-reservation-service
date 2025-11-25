@@ -16,15 +16,15 @@ management:
       exposure:
         include: "health,metrics,prometheus"
 
-  tracing:
-    enabled: true
-
-  otlp:
-    tracing:
-      export:
-        enabled: true
-      endpoint: http://jaeger-inmemory-instance-collector.observability.svc.cluster.local:4318/v1/traces
-
 logging:
   level:
     root: info
+
+otel:
+  exporter:
+    otlp:
+      endpoint: http://jaeger-inmemory-instance-collector.observability.svc.cluster.local:4318
+  logs:
+    exporter: none
+  metrics:
+    exporter: none

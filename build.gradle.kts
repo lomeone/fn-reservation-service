@@ -2,9 +2,8 @@ import java.io.ByteArrayOutputStream
 
 val group_name: String by project
 
-val mongodbDriverVersion: String by project
-
 val logback_version: String by project
+val opentelemetryInstrumentationVersion: String by project
 val eunoiaExceptionVersion: String by project
 
 plugins {
@@ -64,8 +63,17 @@ subprojects {
         jvmToolchain(21)
     }
 
+    dependencyManagement {
+        imports {
+            mavenBom("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:$opentelemetryInstrumentationVersion")
+        }
+    }
+
     dependencies {
         implementation("org.springframework.boot:spring-boot-starter-validation")
+
+        // Observability
+        implementation("io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter")
 
         implementation("ch.qos.logback:logback-classic:$logback_version")
 
