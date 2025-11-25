@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream
 val group_name: String by project
 
 val logback_version: String by project
-val opentelemetryVersion: String by project
 val opentelemetryInstrumentationVersion: String by project
 val eunoiaExceptionVersion: String by project
 
@@ -48,7 +47,6 @@ allprojects {
     dependencyManagement {
         imports {
             mavenBom("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:$opentelemetryInstrumentationVersion")
-            mavenBom("io.opentelemetry:opentelemetry-bom:$opentelemetryVersion")
         }
     }
 
@@ -57,7 +55,7 @@ allprojects {
 
         // Observability
         implementation("io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter")
-        implementation("io.opentelemetry:opentelemetry-extension-aws")
+        runtimeOnly("io.opentelemetry.instrumentation:opentelemetry-aws-sdk-2.2:2.22.0-alpha")
     }
 
     tasks.test {
