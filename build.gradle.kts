@@ -1,11 +1,9 @@
-import org.springframework.boot.gradle.plugin.SpringBootPlugin
 import java.io.ByteArrayOutputStream
 
 val group_name: String by project
 
 val logback_version: String by project
 val opentelemetryInstrumentationVersion: String by project
-val opentelemetryInstrumentationAwsSdkVerVersion: String by project
 val eunoiaExceptionVersion: String by project
 
 plugins {
@@ -45,20 +43,6 @@ allprojects {
         }
     }
 
-    dependencyManagement {
-        imports {
-            mavenBom("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:$opentelemetryInstrumentationVersion")
-        }
-    }
-
-    dependencies {
-        implementation(platform(SpringBootPlugin.BOM_COORDINATES))
-
-        // Observability
-        implementation("io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter")
-        implementation("io.opentelemetry.instrumentation:opentelemetry-aws-sdk-2.2:$opentelemetryInstrumentationAwsSdkVerVersion")
-    }
-
     tasks.test {
         useJUnitPlatform()
         finalizedBy(tasks.koverVerify, tasks.koverHtmlReport, tasks.koverXmlReport)
@@ -79,8 +63,17 @@ subprojects {
         jvmToolchain(21)
     }
 
+    dependencyManagement {
+        imports {
+            mavenBom("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:$opentelemetryInstrumentationVersion")
+        }
+    }
+
     dependencies {
         implementation("org.springframework.boot:spring-boot-starter-validation")
+
+        // Observability
+        implementation("io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter")
 
         implementation("ch.qos.logback:logback-classic:$logback_version")
 
