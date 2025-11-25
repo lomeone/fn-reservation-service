@@ -55,7 +55,7 @@ allprojects {
 
         // Observability
         implementation("io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter")
-        runtimeOnly("io.opentelemetry.instrumentation:opentelemetry-aws-sdk-2.2:2.22.0-alpha")
+        implementation("io.opentelemetry.instrumentation:opentelemetry-aws-sdk-2.2:2.22.0-alpha")
     }
 
     tasks.test {
